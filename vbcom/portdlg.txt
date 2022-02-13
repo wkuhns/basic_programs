@@ -1,0 +1,176 @@
+Dim WorkPortName As String
+Dim WorkDCB As CommStateDCB
+
+Sub UpdateDialogSettings (Index As Integer)
+    
+    For i% = 0 To 5
+        If WorkDCB.BaudRate = Val(Baud_Rate_Opt(i%).caption) Then
+            Baud_Rate_Opt(i%).value = TRUE
+        End If
+    Next i%
+
+    Parity_Opt(Asc(WorkDCB.Parity)).value = TRUE
+    Data_Bits_Opt(Asc(WorkDCB.ByteSize) - 4).value = TRUE
+    Stop_bits_Opt(Asc(WorkDCB.StopBits)).value = TRUE
+
+End Sub
+
+Sub Comm_Device_Opt_Click (Index As Integer)
+
+    WorkDCB.Id = Chr$(Index)
+    
+    WorkPortName = Comm_Device_Opt(Index).caption + ":"
+
+    UpdateDialogSettings (Index)
+    DisplayQBOpen WorkDCB, WorkPortName, CommRBBuffer, CommTBBuffer, CommReadInterval
+
+End Sub
+
+Sub Cancel_Cmmd_Click ()
+    Unload PortDlg
+End Sub
+
+Sub Reset_Cmmd_Click ()
+    
+    WorkDCB = CommState
+    UpdatePortDlg
+
+End Sub
+
+Sub Ok_Cmmd_Click ()
+
+    If CommDeviceNum > 0 And CommHandle > -1 Then
+
+        NoChange = TRUE
+
+        If CommState.BaudRate <> WorkDCB.BaudRate Then NoChange = FALSE
+        If CommState.Parity <> WorkDCB.Parity Then NoChange = FALSE
+        If CommState.StopBits <> WorkDCB.StopBits Then NoChange = FALSE
+        If CommState.ByteSize <> WorkDCB.ByteSize Then NoChange = FALSE
+
+        If NoChange = TRUE Then
+            Unload PortDlg
+            Exit Sub
+        End If
+
+        UpdateCaption " DIALOG: Change Active Settings (Yes), Post-Pone (No), Return to Dialog (Cancel)", 0
+        
+        Result% = MsgBox("Port Already Active!" + Chr$(13) + "Activate settings Now?", 3 + 16 + 256, "Terminal Sampler II - Port Active")
+    
+        Select Case Result%
+            Case 6
+                UpdateCaption " Changing Port Settings LIVE!", 0
+                
+                CommState = WorkDCB
+                PostState = WorkDCB
+
+                CommPortName = WorkPortName
+                PostPortName = WorkPortName
+
+                ApiErr% = SetCommState(WorkDCB)
+                Unload PortDlg
+            Case 7
+                UpdateCaption " Settings Post-Poned until next CONNECT", 0
+                PostState = WorkDCB
+                PostPortName = WorkPortName
+                Unload PortDlg
+            Case Else
+                DisplayQBOpen WorkDCB, WorkPortName, CommRBBuffer, CommTBBuffer, CommReadInterval
+        End Select
+
+    Else
+
+        CommState = WorkDCB
+        PostState = WorkDCB
+
+        CommPortName = WorkPortName
+        PostPortName = WorkPortName
+        Unload PortDlg
+
+    End If
+
+End Sub
+
+Sub Parity_Opt_Click (Index As Integer)
+
+    If WorkDCB.Parity <> Chr$(Index) Then
+        
+        WorkDCB.Parity = Chr$(Index)
+        DisplayQBOpen WorkDCB, WorkPortName, CommRBBuffer, CommTBBuffer, CommReadInterval
+
+    End If
+
+End Sub
+
+Sub Data_Bits_Opt_Click (Index As Integer)
+
+    If WorkDCB.ByteSize <> Chr$(Index + 4) Then
+
+        WorkDCB.ByteSize = Chr$(Index + 4)
+        DisplayQBOpen WorkDCB, WorkPortName, CommRBBuffer, CommTBBuffer, CommReadInterval
+    
+    End If
+
+End Sub
+
+Sub Baud_Rate_Opt_Click (Index As Integer)
+    
+    If WorkDCB.BaudRate <> Val(Baud_Rate_Opt(Index).caption) Then
+        WorkDCB.BaudRate = Val(Baud_Rate_Opt(Index).caption)
+        DisplayQBOpen WorkDCB, WorkPortName, CommRBBuffer, CommTBBuffer, CommReadInterval
+    End If
+
+End Sub
+
+Sub Stop_Bits_Opt_Click (Index As Integer)
+
+    If WorkDCB.StopBits <> Chr$(Index) Then
+        
+        WorkDCB.StopBits = Chr$(Index)
+        DisplayQBOpen WorkDCB, WorkPortName, CommRBBuffer, CommTBBuffer, CommReadInterval
+
+    End If
+
+End Sub
+
+
+Sub Form_Load ()
+
+    Remove_Items_From_SysMenu PortDlg
+
+    WorkDCB = CommState
+    WorkPortName = CommPortName
+
+    UpdatePortDlg
+
+    CenterDialog PortDlg
+
+End Sub
+
+Sub UpdatePortDlg ()
+    
+    For i% = 1 To 0 Step -1
+        ApiErr% = OpenComm(Comm_Device_Opt(i%).caption + ":", 2048, 2048)
+        Select Case ApiErr%
+            Case IE_HARDWARE, IE_OPEN
+                Comm_Device_Opt(i%).enabled = FALSE
+            Case Else
+                ApiErr% = CloseComm(ApiErr%)
+                Comm_Device_Opt(i%).enabled = TRUE
+                Last% = i%
+        End Select
+        Comm_Device_Opt(i%).value = FALSE
+    Next i%
+
+    If CommDeviceNum > 0 And CommHandle > -1 Then
+        Last% = CommDeviceNum - 1
+        Comm_Device_Opt(Last%).value = TRUE
+    Else
+        Comm_Device_Opt(Last%).value = TRUE
+    End If
+    
+    WorkDCB.Id = Chr$(Last%)
+    WorkPortName = Comm_Device_Opt(Last%).caption + ":"
+
+End Sub
+

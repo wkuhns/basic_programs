@@ -1,0 +1,477 @@
+1 1
+2 1
+0 0
+0 0
+1 2
+0 0
+1 1
+"System"
+"Outputs?"
+1 2
+3 1
+0 0
+0 0
+1 3
+0 0
+1 1
+"Present"
+"Status?"
+1 3
+4 1
+0 0
+0 0
+1 4
+0 0
+1 1
+"Present"
+"Faults?"
+1 4
+5 1
+0 0
+0 0
+1 5
+0 0
+1 1
+"Fault"
+"History?"
+1 5
+6 1
+0 0
+0 0
+1 6
+0 0
+1 1
+"Self"
+"Test?"
+2 1
+0 0
+2 1
+0 0
+0 0
+2 2
+1 1
+"RIGHT GEAR"
+"SAFE"
+2 2
+0 0
+2 1
+0 0
+0 0
+2 3
+1 1
+"LEFT GEAR"
+"SAFE"
+2 3
+0 0
+2 2
+0 0
+0 0
+2 3
+1 1
+"NOSE GEAR"
+"UNSAFE"
+3 1
+0 0
+3 1
+0 0
+0 0
+3 2
+1 1
+"RIGHT GEAR DNLMT"
+"DOWN & LOCKED"
+3 2
+0 0
+3 1
+0 0
+0 0
+3 3
+1 1
+"RIGHT GEAR DNLMT"
+"TARGET NEAR"
+3 3
+0 0
+3 2
+0 0
+0 0
+3 4
+1 1
+"RIGHT GEAR DNLMT"
+".05 .12(0.10).20 "
+3 4
+0 0
+3 3
+0 0
+0 0
+3 5
+1 1
+"RIGHT GEAR UPLMT"
+"NOT UP"
+3 5
+0 0
+3 4
+0 0
+0 0
+3 6
+1 1
+"RIGHT GEAR UPLMT"
+"TARGET FAR"
+3 6
+0 0
+3 5
+0 0
+0 0
+3 7
+1 1
+"RIGHT GEAR UPLMT "
+".05 .12(>.30).20"
+3 7
+0 0
+3 6
+0 0
+0 0
+3 8
+1 1
+"LEFT GEAR DNLMT"
+"DOWN & LOCKED"
+3 8
+0 0
+3 7
+0 0
+0 0
+3 9
+1 1
+"LEFT GEAR DNLMT"
+"LARGE GAP "
+3 9
+0 0
+3 8
+0 0
+0 0
+3 10
+1 1
+"LEFT GEAR DNLMT"
+".05 .12(0.25).20"
+3 10
+0 0
+3 9
+0 0
+0 0
+3 11
+1 1
+"LEFT GEAR UPLMT"
+"NOT UP"
+3 11
+0 0
+3 10
+0 0
+0 0
+3 12
+1 1
+"LEFT GEAR UPLMT"
+"TARGET FAR"
+3 12
+0 0
+3 11
+0 0
+0 0
+3 13
+1 1
+"LEFT GEAR UPLMT"
+".05 .12(>.30).20"
+3 13
+0 0
+3 12
+0 0
+0 0
+3 14
+1 1
+"NOSE GEAR"
+"DOWN & LOCKED"
+3 14
+0 0
+3 13
+0 0
+0 0
+3 15
+1 1
+"NOSE GEAR DNLMT"
+"SMALL GAP "
+3 15
+0 0
+3 14
+0 0
+0 0
+3 16
+1 1
+"NOSE GEAR DNLMT"
+".05 .12(0.04).20"
+3 16
+0 0
+3 15
+0 0
+0 0
+3 17
+1 1
+"NOSE GEAR UPLMT"
+"STATE UNKNOWN"
+3 17
+0 0
+3 16
+0 0
+0 0
+3 1
+1 1
+"NOSE GEAR UPLMT"
+"SENSOR FAILOPEN"
+4 1
+0 0
+4 1
+0 0
+0 0
+4 2
+1 1
+"PRESENT FAULTS:"
+"03"
+4 2
+0 0
+4 1
+0 0
+0 0
+4 3
+1 1
+"NOSE GEAR UPLMT"
+"SENSOR OPEN"
+4 3
+0 0
+4 2
+0 0
+0 0
+4 4
+1 1
+"NOSE GEAR DNLMT"
+"SMALL GAP .04"
+4 4
+0 0
+4 3
+0 0
+0 0
+4 1
+1 1
+"LEFT GEAR DNLMT"
+"BOARD A1 F1"
+5 1
+0 0
+5 1
+0 0
+0 0
+5 2
+1 1
+"FAULT HISTORY:"
+"11 FAULTS"
+5 2
+0 0
+5 1
+0 0
+0 0
+5 3
+1 1
+"LAST FLIGHT"
+"LEG NUMBER: 75"
+5 3
+6 1
+5 2
+0 0
+5 4
+0 0
+1 1
+"FAULTS FOR"
+"LEG NUMBER 75?"
+5 4
+7 1
+5 3
+0 0
+5 5
+0 0
+1 1
+"FAULTS FOR "
+"LEG NUMBER 74?"
+5 5
+8 1
+5 4
+0 0
+5 6
+0 0
+1 1
+"FAULTS FOR "
+"LEG NUMBER 73?"
+5 6
+9 1
+5 5
+0 0
+5 7
+0 0
+1 1
+"FAULTS FOR "
+"LEG NUMBER 72?"
+5 7
+10 1
+5 6
+0 0
+5 8
+0 0
+1 1
+"FAULTS FOR "
+"LEG NUMBER 42?"
+5 8
+0 0
+5 1
+0 0
+0 0
+0 0
+1 1
+"END OF FAULT"
+"HISTORY"
+6 1
+0 0
+6 1
+0 0
+6 2
+0 0
+1 1
+"NOSE GEAR UPLMT"
+"SENSOR OPEN   G"
+6 2
+0 0
+6 1
+0 0
+6 3
+0 0
+1 1
+"NOSE GEAR DNLMT"
+"SMALL GAP .04 G"
+6 3
+0 0
+6 2
+0 0
+6 4
+0 0
+1 1
+"LEFT GEAR DNLMT"
+"BOARD A1 F1   A"
+6 4
+0 0
+6 3
+0 0
+5 4
+0 0
+1 1
+"END OF HISTORY"
+"FLIGHT LEG 75"
+7 1
+0 0
+7 1
+0 0
+7 2
+0 0
+1 1
+"NOSE GEAR UPLMT"
+"SENSOR OPEN   A"
+7 2
+0 0
+7 1
+0 0
+7 3
+0 0
+1 1
+"NOSE GEAR UPLMT "
+"SMALL GAP .01 A"
+7 3
+0 0
+7 2
+0 0
+7 4
+0 0
+1 1
+"NOSE GEAR DNLMT"
+"SMALL GAP .04 G"
+7 4
+0 0
+7 3
+0 0
+5 5
+0 0
+1 1
+"END OF HISTORY"
+"FLIGHT LEG 74"
+8 1
+0 0
+8 1
+0 0
+8 2
+0 0
+1 1
+"NOSE GEAR UPLMT"
+"SMALL GAP .02 A"
+8 2
+0 0
+8 1
+0 0
+8 3
+0 0
+1 1
+"NOSE GEAR DNLMT"
+"SMALL GAP .04 G"
+8 3
+0 0
+8 2
+0 0
+5 6
+0 0
+1 1
+"END OF HISTORY"
+"FLIGHT LEG 73"
+9 1
+0 0
+9 1
+0 0
+9 2
+0 0
+1 1
+"NOSE GEAR UPLMT"
+"SMALL GAP .02 A"
+9 2
+0 0
+9 1
+0 0
+9 3
+0 0
+1 1
+"NOSE GEAR DNLMT"
+"SMALL GAP .04 G"
+9 3
+0 0
+9 2
+0 0
+5 7
+0 0
+1 1
+"END OF HISTORY"
+"FLIGHT LEG 72"
+10 1
+0 0
+10 1
+0 0
+10 2
+0 0
+1 1
+"LEFT GEAR UPLMT"
+"LARGE GAP .18 A"
+10 2
+0 0
+10 1
+0 0
+5 8
+0 0
+1 1
+"END OF HISTORY"
+"FLIGHT LEG 42"

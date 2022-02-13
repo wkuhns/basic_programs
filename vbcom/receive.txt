@@ -1,0 +1,146 @@
+Dim MinWindowSize As Integer
+
+Sub Form_Load ()
+
+    Height = Screen.Height / 2
+    Width = Screen.Width * .75
+    Top = Screen.Height * .25
+    Left = (Screen.Width - Width) / 2
+
+    Receive_Text.Text = ""
+    Transmit_Text.Text = ""
+
+    Initialize
+
+End Sub
+
+Sub Receive_Timer_Timer ()
+    
+    a$ = ReadCommPort(128)
+
+    If Len(a$) > 0 Then
+        Receive_Text.selstart = Len(Receive_Text.Text) + 1
+        Receive_Text.sellength = 0
+        Receive_Text.seltext = a$
+    End If
+
+End Sub
+
+Sub Receive_Text_KeyPress (KeyAscii As Integer)
+
+    KeyAscii = 0
+
+End Sub
+
+Sub Form_Unload (Cancel As Integer)
+
+    If CommDemo.Menu_Windows.Enabled Then
+        CommDemo.Menu_Window_Receive_Transmit.Checked = FALSE
+        Hide
+        Cancel = TRUE
+        Exit Sub
+    End If
+
+End Sub
+
+Sub Transmit_Text_KeyPress (KeyAscii As Integer)
+
+    If KeyAscii = 13 Then
+       If CommDemo.Menu_Comm_Send_CRLF.Checked = TRUE Then
+          Work$ = Chr$(13) + Chr$(11)
+       Else
+          Work$ = Chr$(13)
+       End If
+
+       WriteCommPort Transmit_Text.Text + Work$
+       Transmit_Text.Text = ""
+       KeyAscii = 0
+    End If
+
+    ' Remove the BEEP for CTRL characters
+
+    If KeyAscii < 32 Then
+       KeyAscii = 0
+    End If
+
+End Sub
+
+Sub Initialize ()
+    
+    ForeColor = &HFFFFFF
+
+    Text$ = "Receive Window"
+    FontSize = 10
+    
+    tHeight = TextHeight(Text$)
+    tWidth = TextWidth(Text$)
+
+    CurrentX = (ScaleWidth - tWidth) \ 2
+    CurrentY = tHeight * .5
+    
+    Transmit_Text.Move 0, ScaleHeight - Transmit_Text.Height, ScaleWidth, Transmit_Text.Height
+    
+    Receive_Text.Top = tHeight * 2
+    MinWindowSize = Receive_Text.Top
+    Receive_Text.Move 0, Receive_Text.Top, ScaleWidth, ScaleHeight - (Transmit_Text.Height + Receive_Text.Top + tHeight * 2)
+    
+    Text$ = "Transmit Window"
+    FontSize = 10
+    
+    tHeight = TextHeight(Text$)
+    tWidth = TextWidth(Text$)
+
+    CurrentX = (ScaleWidth - tWidth) \ 2
+    CurrentY = Transmit_Text.Top - tHeight * 1.5
+
+    ForeColor = &H0
+
+    MinWindowSize = MinWindowSize + (ScaleHeight - CurrentY) * 2
+
+End Sub
+
+Sub Form_Resize ()
+    
+    Work% = ScaleHeight - MinWindowSize
+
+    If Work% < 0 Then
+        Height = Height + Abs(Work%)
+    End If
+
+    Initialize
+
+End Sub
+
+Sub PaintText ()
+    
+    Cls
+        
+    ForeColor = &H0
+    Text$ = "Receive Window"
+    FontSize = 10
+    
+    tHeight = TextHeight(Text$)
+    tWidth = TextWidth(Text$)
+
+    CurrentX = (ScaleWidth - tWidth) \ 2
+    CurrentY = tHeight * .5
+    Print Text$
+
+    Text$ = "Transmit Window"
+    FontSize = 10
+    
+    tHeight = TextHeight(Text$)
+    tWidth = TextWidth(Text$)
+
+    CurrentX = (ScaleWidth - tWidth) \ 2
+    CurrentY = Transmit_Text.Top - tHeight * 1.5
+    Print Text$
+
+End Sub
+
+Sub Form_Paint ()
+
+    PaintText
+
+End Sub
+

@@ -1,0 +1,86 @@
+6
+name,       GENERAL
+speed,      300
+air,        0
+armor,      5
+wrange,     10
+wstrength,  10
+vision,     100
+buycost,    0
+usecost,    0
+accuracy,   70
+range,      1000
+fuelcap,    100
+stealth,    10
+-------
+name,       TANK
+speed,      600
+air,        0
+armor,      80
+wrange,     30
+wstrength,  80
+vision,     100
+buycost,    100
+usecost,    10
+accuracy,   50
+range,      1000
+fuelcap,    100
+stealth,    5
+-------
+name,       JEEP
+speed,      600
+air,        0
+armor,      10
+wrange,     20
+wstrength,  15
+vision,     100
+buycost,    10
+usecost,    1
+accuracy,   50
+range,      1000
+fuelcap,    20
+stealth,    10
+-------
+name,       DRONE
+speed,      3000
+air,        1
+armor,      5
+wrange,     0
+wstrength,  0
+vision,     90
+buycost,    1000
+usecost,    20
+accuracy,   0
+range,      3000
+fuelcap,    300
+stealth,    30
+-------
+name,       SAM
+speed,      300
+air,        0
+armor,      20
+wrange,     60
+wstrength,  10
+vision,     120
+buycost,    200
+usecost,    5
+accuracy,   70
+range,      200
+fuelcap,    100
+stealth,    10
+-------
+name,       INFANTRY
+speed,      100
+air,        0
+armor,      5
+wrange,     10
+wstrength,  10
+vision,     100
+buycost,    5
+usecost,    1
+accuracy,   70
+range,      200
+fuelcap,    100
+stealth,    40
+-------
+

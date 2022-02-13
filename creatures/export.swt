@@ -1,0 +1,67 @@
+[Setup Wizard Template]
+TemplateDate=11/20/99 12:09:33 PM
+
+[Select Project and Options]
+txtProjFile=P:\creatures\creature.vbp
+chkProjRebuild=0
+optBldSetup=True
+chkIncludeDEP=1
+optInternet=False
+optDEPOnly=False
+
+[Distribution Method]
+optFloppyTarg=False
+optSingleDirTarg=False
+optMultDirTarg=True
+
+[Multiple Directories]
+cboFloppyDrives=0
+cboFloppyDriveSize=0
+txtDirTarget=P:\creatures\setupdisks\
+
+[Internet Package]
+optRemoteSite=True
+optLocalSite=False
+txtLocalSite=
+
+[Data Access]
+chkUseJet=1
+chkUseODBC=0
+Isam0=
+
+[ActiveX Server Components]
+File1=
+
+[Confirm Dependencies]
+File1="E:\WINNT\System32\COMDLG32.OCX",True,32764
+File2="E:\WINNT\System32\plugin.ocx",True,32763
+File3="E:\WINNT\System32\COMCTL32.OCX",True,32764
+File4="E:\WINNT\system32\COMCT232.OCX",True,32764
+File5=
+
+[Shared ActiveX Application]
+optDeployApplication=True
+optDeployShared=False
+optRemoteServer1=True
+optRemoteServer0=False
+
+[File Summary]
+File1="E:\WINNT\System32\MSVBVM50.dll",True,"$(WinSysPathSysFile)",$(DLLSelfRegister),False
+File2="E:\Program Files\DevStudio\VB\SETUPKIT\KITFIL32\SYS32\StdOle2.tlb",True,"$(WinSysPathSysFile)",$(TLBRegister),False
+File3="E:\Program Files\DevStudio\VB\SETUPKIT\KITFIL32\SYS32\OleAut32.dll",True,"$(WinSysPathSysFile)",$(DLLSelfRegister),False
+File4="E:\Program Files\DevStudio\VB\SETUPKIT\KITFIL32\SYS32\OlePro32.dll",True,"$(WinSysPathSysFile)",$(DLLSelfRegister),False
+File5="E:\Program Files\DevStudio\VB\SETUPKIT\KITFIL32\SYS32\AsycFilt.dll",True,"$(WinSysPathSysFile)",,False
+File6="E:\Program Files\DevStudio\VB\SETUPKIT\KITFIL32\SYS32\Ctl3d32.dll",True,"$(WinSysPathSysFile)",,False
+File7="E:\Program Files\DevStudio\VB\SETUPKIT\KITFIL32\SYS32\ComCat.dll",True,"$(WinSysPathSysFile)",$(DLLSelfRegister),False
+File8="E:\WINNT\System32\COMDLG32.OCX",True,"$(WinSysPath)",$(DLLSelfRegister),True
+File9="E:\WINNT\System32\plugin.ocx",True,"$(WinSysPath)",,True
+File10="E:\WINNT\System32\COMCTL32.OCX",True,"$(WinSysPath)",$(DLLSelfRegister),True
+File11="E:\WINNT\system32\COMCT232.OCX",True,"$(WinSysPath)",$(DLLSelfRegister),True
+File12="P:\creatures\creature.exe",True,"$(AppPath)",,False
+File13="P:\creatures\creature.DEP",True,"$(AppPath)",,False
+File14="P:\creatures\curvefit.xls",True,"$(AppPath)",,False
+File15="P:\creatures\creature.vbp",True,"$(AppPath)",,False
+File16="P:\creatures\creaturedataform.frm",True,"$(AppPath)",,False
+File17="P:\creatures\creaturemain.frm",True,"$(AppPath)",,False
+File18="P:\creatures\creature.bas",True,"$(AppPath)",,False
+File19="P:\creatures\physicsform.frm",True,"$(AppPath)",,False

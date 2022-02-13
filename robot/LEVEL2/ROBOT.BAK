@@ -1,0 +1,361 @@
+program robot;
+
+uses dos, crt, graph, strings, gamecard, parallel;
+
+
+{
+     CalArray is a global array of sensor calibration values. The first
+     index is the channel number (1 through 4). There is a 2x5 array
+     that contains angle vs. sensor reading values for each channel.
+}
+var
+    CalArray : array[1..4, 1..2, 1..5] of real;
+    DirectionArray : array[1..4, 1..2] of integer;
+
+{--------------------- procedures and functions --------------------------}
+
+function ConvertUnits(channel,sensor : integer) : real;
+
+var
+    s1, s2, a1, a2 : real;              { table value storage }
+    i : integer;
+
+begin
+    if CalArray[channel,2,1] > CalArray[channel,2,2] then
+        begin                       { descending table }
+        i := 5;
+        while (CalArray[channel,2,i] < sensor) and (i > 1) do i := i - 1;
+        a1 := CalArray[channel,1,i];
+        s1 := CalArray[channel,2,i];
+        a2 := CalArray[channel,1,i+1];
+        s2 := CalArray[channel,2,i+1];
+        ConvertUnits := (((s1-sensor) * (a2-a1)) / (s1-s2)) + a1;
+    end;
+
+    if CalArray[channel,2,1] < CalArray[channel,2,2] then
+        begin
+        i := 1;
+        while (CalArray[channel,2,i] < sensor) and (i < 5) do i := i + 1;
+        a1 := CalArray[channel,1,i-1];
+        s1 := CalArray[channel,2,i-1];
+        a2 := CalArray[channel,1,i];
+        s2 := CalArray[channel,2,i];
+        ConvertUnits := (((sensor-s1) * (a2-a1)) / (s2-s1)) + a1;
+        end;
+end;
+
+
+procedure ShowStats;
+
+var
+   i, jx, jy, kx, ky, sensor : integer;
+   angle, angle1 : real;
+   sbuff : string[10];
+
+begin
+     for i := 0 to 2 do
+     begin
+          setviewport(150 * i + 90, 20, 150 * i + 140, 50, ClipOn);
+          clearviewport;
+          sensor := ReadAnalogSensor(i+1);
+          angle := ConvertUnits(i+1, sensor);
+          str(sensor:3,sbuff);
+          OutTextXY(20, 0,sbuff );
+          str(angle:6:1,sbuff);
+          OutTextXY(0, 20,sbuff);
+    end;
+
+    {---- top view ----}
+    setviewport(50, 200, 250, 430, ClipOn);
+    clearviewport;
+    sensor := ReadAnalogSensor(1);
+    angle := ConvertUnits(1, sensor);
+    if angle > 360 then
+       angle := angle - 360;
+    angle := angle / 57.29578;
+    jx := trunc(100 + 100 * sin(angle));
+    jy := trunc(100 + 100 * cos(angle));
+    setlinestyle(solidln,0,ThickWidth);
+    line(100, 100, jx, jy);
+
+    {---- side view ----}
+    SetViewPort(300, 200, 500, 430, ClipOn);
+    clearviewport;
+    sensor := ReadAnalogSensor(2);
+    angle1 := 45 + ConvertUnits(2, sensor);
+    angle1 := angle1 / 57.29578;
+    jx := trunc(100 + 50 * sin(angle1));
+    jy := trunc(100 + 50 * cos(angle1));
+    setlinestyle(solidln,0,ThickWidth);
+    line(100, 100, jx, jy);
+
+    sensor := ReadAnalogSensor(3);
+    angle := 45 + ConvertUnits(3, sensor);
+    angle := angle + angle1;
+    if angle > 360 then
+       angle := angle - 360;
+    angle := angle / 57.29578;
+    kx := trunc(100 + 50 * sin(angle));
+    ky := trunc(100 + 50 * cos(angle));
+    setlinestyle(solidln,0,ThickWidth);
+    line(jx, jy, kx, ky);
+
+
+end;
+
+procedure setposition(channel : integer; angle : real);
+
+var
+    currentangle, range, delta : real;
+    direction, power : integer;
+    fwd : boolean;
+
+begin
+    currentangle := ConvertUnits(channel,ReadAnalogSensor(channel));
+    range := CalArray[channel,1,5] - CalArray[channel,1,1];
+    delta := abs(currentangle-angle);
+    range := range / 4;                         { full speed for long travel }
+    fwd := currentangle > angle;
+
+    if fwd then
+    begin
+        direction := DirectionArray[channel,2];
+        while currentangle > angle do
+        begin
+            delta := currentangle - angle;
+            power := trunc(delta / range * 7 + 3);
+            if (delta > range) then power := 10;
+            if (power = 0) then power := 1;
+            SetMotor(channel,direction,1);
+            delay(power);                           { motor on time }
+            SetMotor(channel,direction,0);
+            delay(10-power);                        { motor off time }
+            currentangle := ConvertUnits(channel,ReadAnalogSensor(channel));
+            ShowStats;
+        end;
+        SetMotor(channel,direction,0);
+    end;
+
+    if not fwd then
+    begin
+        direction := DirectionArray[channel,1];
+        while currentangle < angle do
+        begin
+            delta := angle - currentangle;
+            power := trunc(delta / range * 7 + 3);
+            if (delta > range) then power := 10;
+            if (power = 0) then power := 1;
+            SetMotor(channel,direction,1);
+            delay(power);                           { motor on time }
+            SetMotor(channel,direction,0);
+            delay(10-power);                        { motor off time }
+            currentangle := ConvertUnits(channel,ReadAnalogSensor(channel));
+            ShowStats;
+        end;
+        SetMotor(channel,direction,0);
+    end;
+end;
+
+procedure moveto(joint : integer; angle : real);
+var
+    quitflag : char;
+    direction, speed : integer;
+    sbuff : string[10];
+begin
+    quitflag := 'x';             { never this value in the loop }
+    direction := 0;
+    speed := 0;
+    setviewport(100,170,600,190, ClipOn);
+    OutTextXY(0,20,'Manually controlling channel ');
+    OutTextXY(0,40,'Quit, Faster, Slower, Reverse, Pause');
+    while quitflag <> 'q' do
+    begin
+        SetMotor(joint,direction,1);
+        delay(speed);                           { motor on time }
+        SetMotor(joint,direction,0);
+        delay(10-speed);                        { motor off time }
+        ShowStats;
+        if KeyPressed then
+        begin
+            quitflag := ReadKey;
+            case quitflag of
+                'f': speed := speed + 1;
+                's': speed := speed - 1;
+                'r': direction := direction + 1;
+                'p': speed := 0;
+            end;
+            if speed > 10 then speed := 10;
+            if speed < 0 then speed := 0;
+            if direction = 2 then direction := 0;
+        end;
+    end;
+    clearviewport;
+end;
+
+procedure GetCalibration(channel : integer);
+
+var
+    i : integer;
+    sbuff : string[10];
+    cbuff : string[80];
+begin
+
+    setviewport(100,170,600,190, ClipOn);
+    for i := 1 to 5 do
+    begin
+        cbuff := 'Move Joint ';
+        str(channel,sbuff);
+        cbuff := cbuff + sbuff + ' to ';
+        str(CalArray[channel,1,i]:5:1,sbuff);
+        cbuff := cbuff + sbuff + ' degrees';
+{        strcat(cbuff,' to ');
+        str(CalArray[channel,1,i]:5:1,sbuff);
+        strcat(cbuff,sbuff);
+        strcat(cbuff,' degrees'); }
+        OutTextXY(0,0,cbuff);
+        moveto(channel, CalArray[channel,1,i]);
+        CalArray[channel,2,i] := ReadAnalogSensor(channel);
+    end;
+end;
+
+procedure ReadCalFromDisk;
+
+var
+    i, channel : integer;
+    infile : Text;
+
+begin
+    for channel := 1 to 4 do
+    begin
+        case channel of
+            1: assign(infile, 'cal1.dat');
+            2: assign(infile, 'cal2.dat');
+            3: assign(infile, 'cal3.dat');
+            4: assign(infile, 'cal4.dat');
+        end;
+
+        FileMode := 0;                      {read only}
+        reset(infile);
+
+        for i := 1 to 5 do
+        begin
+            readln(infile, CalArray[channel,1,i], CalArray[channel,2,i]);
+        end;
+
+        close(infile);
+    end;
+end;
+
+procedure WriteCalToDisk;
+
+var
+    i, channel : integer;
+    outfile : Text;
+
+begin
+    for channel := 1 to 4 do
+    begin
+        case channel of
+            1: assign(outfile, 'cal1.dat');
+            2: assign(outfile, 'cal2.dat');
+            3: assign(outfile, 'cal3.dat');
+            4: assign(outfile, 'cal4.dat');
+        end;
+
+        FileMode := 1;                      {write only}
+        rewrite(outfile);
+
+        for i := 1 to 5 do
+        begin
+            writeln(outfile, CalArray[channel,1,i]:5:1,CalArray[channel,2,i]:6:1);
+        end;
+
+        close(outfile);
+    end;
+end;
+
+procedure paintmenu;
+
+var
+   i : integer;
+
+begin
+     for i := 0 to 3 do
+     begin
+          OutTextXY(150 * i + 20, 20, 'Sensor');
+          OutTextXY(150 * i + 20, 40, 'Angle');
+     end;
+     OutTextXY(50, 80, '1: Select channel 1');
+     OutTextXY(50, 90, '2: Select channel 2');
+     OutTextXY(50, 100, '3: Select channel 3');
+     OutTextXY(50, 110, 's: Set position for channel');
+     OutTextXY(300, 80, 'w : Write cal data to disk');
+     OutTextXY(300, 90, 'r : Recalibrate channel');
+     OutTextXY(300, 100, 'm : Manually move channel');
+
+     OutTextXY(300, 110, 'q : Quit');
+end;
+{----------------------- body of robot main program ----------------------}
+
+var
+    i, choice, channel : integer;
+    angle : real;
+    quitflag : char;
+    GraphDriver, GraphMode, ErrorCode : integer;
+
+begin
+
+    GraphDriver := Detect;
+    InitGraph(GraphDriver, GraphMode, 'E:\TP\BGI');
+    ErrorCode := GraphResult;
+    if ErrorCode <> grOk then
+    begin
+        writeln('Graphics error: ', GraphErrorMsg(ErrorCode));
+        halt(1);
+    end;
+{    CloseGraph;  }
+
+    ReadCalFromDisk;
+    DirectionArray[1,1] := 0;
+    DirectionArray[1,2] := 1;
+    DirectionArray[2,1] := 0;
+    DirectionArray[2,2] := 1;
+    DirectionArray[3,1] := 0;
+    DirectionArray[3,2] := 1;
+
+    channel := 1;
+
+    cleardevice;
+{    window(1,1,80,24);   }
+    paintmenu;
+    while quitflag <> 'q' do
+    begin
+        ShowStats;
+        if KeyPressed then
+        begin
+            quitflag := ReadKey;
+
+            case quitflag of
+                 '1': channel := 1;
+                 '2': channel := 2;
+                 '3': channel := 3;
+                 's': begin
+                         angle := 50;
+                         while angle > 0 do
+                         begin
+                              OutTextXY(10,15,'Enter angle, -1 to exit      ');
+                          {    OutTextXY(35,15);    }
+                              read(angle);
+                              if angle >= 0 then
+                                 SetPosition(channel,angle);
+                         end;
+                    end;
+                    'w': WriteCalToDisk;                     {write it back out}
+                    'r': GetCalibration(channel);            {calibrate sensor}
+                    'm': Moveto(channel, 0);
+            end;  { end case }
+{            cleardevice;
+}            paintmenu;
+        end; {end keypressed }
+    end; {while choice < 8 }
+end.

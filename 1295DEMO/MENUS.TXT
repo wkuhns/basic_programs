@@ -1,0 +1,27 @@
+Toplevel Menu (menu 1)
+    1) System Outputs		-> menu 2
+    2) Present Status		-> menu 3
+	Prox 1-5		-> menu 10
+	Prox 6-10		-> menu 11
+	System Inputs		-> menu 12
+	R/T 1-5			-> menu 13
+	R/T 6-10		-> menu 14
+    3) Present Faults		-> menu 4
+    4) Fault History by leg	-> menu 5
+	leg menu		-> menu 15
+	    leg 75		-> menu 20	FHBASEMENU = 20
+	    leg 74		-> menu 21
+	    leg 73		-> menu 22
+	    leg 72		-> menu 23
+	    leg 42		-> menu 24
+    5) Fault history by channel	-> menu 6
+	No-channel faults	-> menu 16
+	channels 1-5		-> menu 17
+	channels 6-10		-> menu 18
+    6) Self Test		-> menu 7
+    7) Erase F/H		-> menu 8
+
+4-line realtime display	(menu 9) 
+
+
+

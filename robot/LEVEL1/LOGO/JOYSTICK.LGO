@@ -1,0 +1,14 @@
+to readjoy
+   output first dllcall [w readjoya v 0]
+end
+
+to square
+
+repeat 4 [fd 80 rt 90]
+
+end
+
+to startjoy
+    dllload "joydll.dll
+end
+

@@ -1,0 +1,400 @@
+
+Dim WorkRB As Integer
+Dim WorkTB As Integer
+Dim WorkDCB As CommStateDCB
+Dim WorkInterval As Integer
+
+Dim WidthOfText As Integer
+
+
+Sub Form_Load ()
+
+    Remove_Items_From_SysMenu LineDlg
+
+    Initialize
+
+    CenterDialog LineDlg
+
+End Sub
+
+
+Sub Initialize ()
+    
+    WidthOfText = TextWidth("999991")
+
+    SizeControls
+
+    Comm_Receive_Scroll.value = CommRBBuffer
+    WorkRB = CommRBBuffer
+
+    Comm_Transmit_Scroll.value = CommTBBuffer
+    WorkTB = CommTBBuffer
+
+    If CommDeviceNum > 0 And CommHandle > -1 Then
+        Comm_Buffer_Size_Frame.enabled = FALSE
+        Comm_Buffer_Size_Label.enabled = FALSE
+        
+        Comm_Receive_Text.enabled = FALSE
+        Comm_Receive_Label.enabled = FALSE
+        
+        Comm_Transmit_Text.enabled = FALSE
+        Comm_Transmit_Label.enabled = FALSE
+    End If
+
+    
+    Signal_Detect_CD_Scroll.value = CommState.RlsTimeOut
+    Signal_Detect_CS_Scroll.value = CommState.CtsTimeOut
+    Signal_Detect_DS_Scroll.value = CommState.DsrTimeOut
+    WorkDCB = CommState
+
+    Poll_Interval_Scroll.value = CommReadInterval
+    WorkInterval = CommReadInterval
+
+End Sub
+
+Sub Reset_Command_Click ()
+
+    Initialize
+
+End Sub
+
+Sub Cancel_Command_Click ()
+
+    Unload LineDlg
+
+End Sub
+
+Sub OK_Command_Click ()
+    
+    If CommDeviceNum > 0 And CommHandle > -1 Then
+
+        NoChange = TRUE
+
+        If WorkRB <> CommRBBuffer Then NoChange = FALSE
+        If WorkTB <> CommTBBuffer Then NoChange = FALSE
+        If WorkInterval <> CommReadInterval Then NoChange = FALSE
+        If WorkDCB.RlsTimeOut <> CommState.RlsTimeOut Then NoChange = FALSE
+        If WorkDCB.CtsTimeOut <> CommState.CtsTimeOut Then NoChange = FALSE
+        If WorkDCB.DsrTimeOut <> CommState.DsrTimeOut Then NoChange = FALSE
+
+        If NoChange = TRUE Then
+            Unload LineDlg
+            Exit Sub
+        End If
+        
+        UpdateCaption " DIALOG: Change Active Settings (Yes), Post-Pone (No), Return to Dialog (Cancel)", 0
+        
+        Result% = MsgBox("Port Already Active!" + Chr$(13) + "Activate settings Now?", 3 + 16 + 256, "Terminal Sampler II - Port Active")
+    
+        Select Case Result%
+            Case 6
+                UpdateCaption " Changing Port Settings LIVE!", 0
+                
+                CommRBBuffer = WorkRB
+                CommTBBuffer = WorkTB
+                CommState = WorkDCB
+                CommReadInterval = WorkInterval
+
+                PostRBBuffer = WorkRB
+                PostTBBuffer = WorkTB
+                PostState = WorkDCB
+                PostReadInterval = WorkInterval
+                
+                Receive.Receive_Timer.interval = CommReadInterval
+
+                ApiErr% = SetCommState(WorkDCB)
+                
+                Unload LineDlg
+            Case 7
+                UpdateCaption " Settings Post-Poned until next CONNECT", 0
+                
+                PostRBBuffer = WorkRB
+                PostTBBuffer = WorkTB
+                PostState = WorkDCB
+                PostReadInterval = WorkInterval
+
+                Unload LineDlg
+            Case Else
+                DisplayQBOpen WorkDCB, CommPortName$, WorkRB, WorkTB, WorkInterval
+        End Select
+
+    Else
+
+        CommRBBuffer = WorkRB
+        CommTBBuffer = WorkTB
+        CommState = WorkDCB
+        CommReadInterval = WorkInterval
+
+        PostRBBuffer = WorkRB
+        PostTBBuffer = WorkTB
+        PostState = WorkDCB
+        PostReadInterval = WorkInterval
+
+        Unload LineDlg
+
+    End If
+
+End Sub
+
+Sub Signal_Detect_CD_Scroll_Change ()
+
+    ProcessScrollChange Signal_Detect_CD_Scroll, Signal_Detect_CD_Text
+
+End Sub
+
+Sub Signal_Detect_CS_Scroll_Change ()
+
+    ProcessScrollChange Signal_Detect_CS_Scroll, Signal_Detect_CS_Text
+
+End Sub
+
+Sub Signal_Detect_DS_Scroll_Change ()
+
+    ProcessScrollChange Signal_Detect_DS_Scroll, Signal_Detect_DS_Text
+
+End Sub
+
+Sub Comm_Receive_Scroll_Change ()
+
+    ProcessScrollChange Comm_Receive_Scroll, Comm_Receive_Text
+
+End Sub
+
+
+Sub Comm_Transmit_Scroll_Change ()
+
+    ProcessScrollChange Comm_Transmit_Scroll, Comm_Transmit_Text
+
+End Sub
+
+Sub Poll_Interval_Scroll_Change ()
+
+    ProcessScrollChange Poll_Interval_Scroll, Poll_Interval_Text
+
+End Sub
+
+Sub Poll_Interval_Text_KeyPress (KeyAscii As Integer)
+
+    ProcessTextKeyPress Poll_Interval_Scroll, Poll_Interval_Text, Comm_Receive_Text, KeyAscii
+
+End Sub
+
+
+Sub Comm_Receive_Text_KeyPress (KeyAscii As Integer)
+
+    ProcessTextKeyPress Comm_Receive_Scroll, Comm_Receive_Text, Comm_Transmit_Text, KeyAscii
+
+End Sub
+
+
+Sub Comm_Receive_Text_Change ()
+
+    ProcessTextChange Comm_Receive_Scroll, Comm_Receive_Text
+
+    WorkRB = Comm_Receive_Scroll.value
+    
+    DisplayQBOpen WorkDCB, CommPortName$, WorkRB, WorkTB, WorkInterval
+
+End Sub
+
+
+Sub Comm_Receive_Text_LostFocus ()
+
+    ProcessTextLostFocus Comm_Receive_Scroll, Comm_Receive_Text
+
+End Sub
+
+
+Sub ProcessTextChange (A_Scroll As Control, A_Text As Control)
+
+
+    WorkVal& = Val(A_Text.Text)
+
+    If WorkVal& > A_Scroll.Max Then
+        A_Text.Text = LTrim$(Str$(A_Scroll.Max))
+        WorkVal& = A_Scroll.Max
+    ElseIf WorkVal& < A_Scroll.Min Then
+        Exit Sub
+    End If
+        
+    A% = Len(A_Text.Text)
+
+    A_Scroll.value = WorkVal&
+
+    If A% = 0 Then
+        A_Text.SelStart = Len(A_Text.Text)
+    End If
+
+End Sub
+
+Sub Comm_Transmit_Text_Change ()
+
+    ProcessTextChange Comm_Transmit_Scroll, Comm_Transmit_Text
+
+    WorkTB = Comm_Transmit_Scroll.value
+
+    DisplayQBOpen WorkDCB, CommPortName$, WorkRB, WorkTB, WorkInterval
+
+End Sub
+
+Sub Poll_Interval_Text_Change ()
+
+    ProcessTextChange Poll_Interval_Scroll, Poll_Interval_Text
+
+    WorkInterval = Poll_Interval_Scroll.value
+
+    DisplayQBOpen WorkDCB, CommPortName$, WorkRB, WorkTB, WorkInterval
+
+End Sub
+
+Sub Signal_Detect_CD_Text_Change ()
+
+    ProcessTextChange Signal_Detect_CD_Scroll, Signal_Detect_CD_Text
+
+    WorkDCB.RlsTimeOut = Signal_Detect_CD_Scroll.value
+
+    DisplayQBOpen WorkDCB, CommPortName$, WorkRB, WorkTB, WorkInterval
+
+End Sub
+
+Sub Signal_Detect_CS_Text_Change ()
+
+    ProcessTextChange Signal_Detect_CS_Scroll, Signal_Detect_CS_Text
+
+    WorkDCB.CtsTimeOut = Signal_Detect_CS_Scroll.value
+
+    DisplayQBOpen WorkDCB, CommPortName$, WorkRB, WorkTB, WorkInterval
+
+End Sub
+
+Sub Signal_Detect_DS_Text_Change ()
+
+    ProcessTextChange Signal_Detect_DS_Scroll, Signal_Detect_DS_Text
+
+    WorkDCB.DsrTimeOut = Signal_Detect_DS_Scroll.value
+
+    DisplayQBOpen WorkDCB, CommPortName$, WorkRB, WorkTB, WorkInterval
+
+End Sub
+
+Sub ProcessTextKeyPress (A_Scroll As Control, A_Text As Control, Next_Text As Control, KeyAscii As Integer)
+
+    Select Case KeyAscii
+        Case 8
+        Case 13
+            KeyAscii = 0
+            Next_Text.SetFocus
+        Case Asc("0") To Asc("9")
+            If A_Text.Sellength = 0 Then
+                If KeyAscii = Asc("0") Then
+                    If A_Text.SelStart = 0 Then
+                        KeyAscii = 0
+                    ElseIf Val(A_Text.Text) = 0 Then
+                        KeyAscii = 0
+                    End If
+                ElseIf Len(A_Text.Text) >= Len(Str$(A_Scroll.Max)) - 1 Then
+                    KeyAscii = 0
+                End If
+            End If
+        Case Else
+            KeyAscii = 0
+    End Select
+
+End Sub
+
+Sub ProcessScrollChange (A_Scroll As Control, A_Text As Control)
+
+    Work$ = LTrim$(Str$(A_Scroll.value))
+
+    If Work$ <> LTrim$(A_Text.Text) Then
+        A_Text.Text = Work$
+    End If
+
+End Sub
+
+Sub Comm_Transmit_Text_KeyPress (KeyAscii As Integer)
+
+    ProcessTextKeyPress Comm_Transmit_Scroll, Comm_Transmit_Text, Signal_Detect_CD_Text, KeyAscii
+
+End Sub
+
+Sub Signal_Detect_CD_Text_KeyPress (KeyAscii As Integer)
+
+    ProcessTextKeyPress Signal_Detect_CD_Scroll, Signal_Detect_CD_Text, Signal_Detect_CS_Text, KeyAscii
+
+End Sub
+
+Sub Signal_Detect_CS_Text_KeyPress (KeyAscii As Integer)
+
+    ProcessTextKeyPress Signal_Detect_CS_Scroll, Signal_Detect_CS_Text, Signal_Detect_DS_Text, KeyAscii
+
+End Sub
+
+Sub Signal_Detect_DS_Text_KeyPress (KeyAscii As Integer)
+
+    ProcessTextKeyPress Signal_Detect_DS_Scroll, Signal_Detect_DS_Text, Poll_Interval_Text, KeyAscii
+
+End Sub
+
+Sub ProcessTextLostFocus (A_Scroll As Control, A_Text As Control)
+    
+    If Len(A_Text.Text) = 0 Then
+        A_Text.Text = LTrim$(Str$(A_Scroll.Min))
+        A_Text.SelStart = Len(A_Text.Text)
+    ElseIf Val(A_Text.Text) < A_Scroll.Min Then
+        A_Text.Text = LTrim$(Str$(A_Scroll.Min))
+    End If
+    
+End Sub
+
+Sub Comm_Transmit_Text_LostFocus ()
+
+    ProcessTextLostFocus Comm_Transmit_Scroll, Comm_Transmit_Text
+
+End Sub
+
+Sub Poll_Interval_Text_LostFocus ()
+
+    ProcessTextLostFocus Poll_Interval_Scroll, Poll_Interval_Text
+
+End Sub
+
+Sub Signal_Detect_CD_Text_LostFocus ()
+
+    ProcessTextLostFocus Signal_Detect_CD_Scroll, Signal_Detect_CD_Text
+
+End Sub
+
+Sub Signal_Detect_CS_Text_LostFocus ()
+
+    ProcessTextLostFocus Signal_Detect_CS_Scroll, Signal_Detect_CS_Text
+
+End Sub
+
+Sub Signal_Detect_DS_Text_LostFocus ()
+
+    ProcessTextLostFocus Signal_Detect_DS_Scroll, Signal_Detect_DS_Text
+
+End Sub
+
+Sub SizeControls ()
+    AdjustControl Comm_Receive_Scroll, Comm_Receive_Text, Comm_Receive_Label, Comm_Buffer_Size_Frame
+    AdjustControl Comm_Transmit_Scroll, Comm_Transmit_Text, Comm_Transmit_Label, Comm_Buffer_Size_Frame
+    AdjustControl Signal_Detect_CD_Scroll, Signal_Detect_CD_Text, Signal_Detect_CD_Label, Signal_Detect_Frame
+    AdjustControl Signal_Detect_CS_Scroll, Signal_Detect_CS_Text, Signal_Detect_CS_Label, Signal_Detect_Frame
+    AdjustControl Signal_Detect_DS_Scroll, Signal_Detect_DS_Text, Signal_Detect_DS_Label, Signal_Detect_Frame
+    AdjustControl Poll_Interval_Scroll, Poll_Interval_Text, Poll_Interval_Label, Poll_Buffer_Frame
+End Sub
+
+
+Sub AdjustControl (A_Scroll As Control, A_Text As Control, A_Label As Control, A_Frame As Control)
+
+    A_Text.Width = WidthOfText
+    A_Text.Left = A_Frame.Width - (A_Label.Left + A_Text.Width)
+    A_Scroll.height = A_Text.height
+    A_Scroll.Width = A_Text.Width * 2
+    A_Scroll.Top = A_Text.Top
+    A_Scroll.Left = A_Text.Left - A_Scroll.Width - A_Text.Width \ 4
+
+End Sub
+

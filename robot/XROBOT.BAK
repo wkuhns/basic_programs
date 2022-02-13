@@ -1,0 +1,384 @@
+program robot;
+
+uses dos, crt, graph, gamecard, parallel;
+
+type
+    JointRec = record
+        Name: string[12];
+        MinAngle: integer;
+        MaxAngle: integer;
+        CalArray: array[1..2, 1..5] of real;
+        NegDirection: integer;
+        PosDirection: integer;
+        MinSpeed: integer;
+        MaxSpeed: integer;
+        DecelRange: integer;
+        TargetAngle: real;
+        CurrentSpeed: integer;
+        CurrentDirection: integer;
+        MotorFlag: boolean;
+        Counts: integer;
+        ActiveFlag: boolean;
+    end;
+
+var
+    axis : array[1..4] of JointRec;
+
+{--------------------- procedures and functions --------------------------}
+
+function GetDegrees(channel, sensor : integer) : real;
+
+var
+    s1, s2, a1, a2 : real;              { table value storage }
+    i : integer;
+
+begin
+    if Axis[channel].CalArray[2,1] > Axis[channel].CalArray[2,2] then
+        begin                       { descending table }
+        i := 5;
+        while (Axis[channel].CalArray[2,i] < sensor) and (i > 1) do i := i - 1;
+        a1 := Axis[channel].CalArray[1,i];
+        s1 := Axis[channel].CalArray[2,i];
+        a2 := Axis[channel].CalArray[1,i+1];
+        s2 := Axis[channel].CalArray[2,i+1];
+        GetDegrees := (((s1-sensor) * (a2-a1)) / (s1-s2)) + a1;
+    end;
+
+    if Axis[channel].CalArray[2,1] < Axis[channel].CalArray[2,2] then
+        begin
+        i := 1;
+        while (Axis[channel].CalArray[2,i] < sensor) and (i < 5) do i := i + 1;
+        a1 := Axis[channel].CalArray[1,i-1];
+        s1 := Axis[channel].CalArray[2,i-1];
+        a2 := Axis[channel].CalArray[1,i];
+        s2 := Axis[channel].CalArray[2,i];
+        GetDegrees := (((sensor-s1) * (a2-a1)) / (s2-s1)) + a1;
+        end;
+end;
+
+{---------------------------------------------------------------------------
+
+  This procedure is used by the main program to update sensor and angle
+  values on the screen.
+
+---------------------------------------------------------------------------}
+
+procedure ShowStats;
+
+var
+   i, sensor : integer;
+   angle : real;
+begin
+     for i := 0 to 2 do
+     begin
+          sensor := ReadAnalogSensor(i+1);
+          angle := GetDegrees(i+1, sensor);
+          gotoxy(20 * i + 11, 2);
+          writeln(sensor:3);
+          gotoxy(20 * i + 8, 3);
+          writeln(Axis[i+1].TargetAngle:6:1);
+          gotoxy(20 * i + 8, 4);
+          writeln(angle:6:1);
+    end;
+end;
+
+procedure motorcycle;
+
+var
+    i : integer;
+    currentangle, delta : real ;
+    moving : boolean;
+    jv : array[1..4] of word;
+
+begin
+    moving := true;
+    while moving do
+    begin
+        moving := false;
+        ReadJoySticks(jv[1], jv[2], jv[3], jv[4]);
+        for i := 1 to 3 do
+        begin
+	    currentangle := GetDegrees(i,jv[i]);
+
+	    {---- Has it moved too far out of position? ----}
+            if currentangle > (Axis[i].TargetAngle + 2) then
+            begin
+		    Axis[i].CurrentDirection := Axis[i].NegDirection;
+		    Axis[i].ActiveFlag := true;
+            end;
+
+            if currentangle < (Axis[i].TargetAngle - 2) then
+            begin
+		    Axis[i].Currentdirection := Axis[i].PosDirection;
+		    Axis[i].ActiveFlag := true;
+	    end; 	{ end out of position }
+
+
+	{---- this axis is active. Check if we've reached target ----}
+
+	if Axis[i].ActiveFlag = true then
+	begin
+
+	    {---- if we're at or past our target, stop ----}
+	    if ((Axis[i].CurrentDirection = Axis[i].PosDirection) and
+	       (CurrentAngle >= Axis[i].TargetAngle)) or
+	       ((Axis[i].CurrentDirection = Axis[i].NegDirection) and
+	       (CurrentAngle <= Axis[i].TargetAngle)) then
+	    begin	{ at or past target, so stop }
+		Axis[i].ActiveFlag := false;
+		Axis[i].MotorFlag := false;
+		Axis[i].CurrentSpeed := 0;
+		SetMotor(i,0,0);
+            end;
+	    {---- not at target yet, still moving ----}
+
+	    if Axis[i].ActiveFlag = true then
+            begin
+		delta := abs(currentangle - Axis[i].TargetAngle);
+		Axis[i].CurrentSpeed :=
+                    trunc(delta / Axis[i].DecelRange * 8 + Axis[i].MinSpeed);
+		Axis[i].MotorFlag := true;
+                {---- run motor a few milliseconds ----}
+		SetMotor(i,Axis[i].CurrentDirection,1);
+                delay(Axis[i].CurrentSpeed);
+		SetMotor(i,0,0);
+
+	    end; 	{ still active }
+
+	end;		{ initially active }
+        if Axis[i].Activeflag = true then
+            moving := true;
+    end; 		{ for each axis }
+  end;                  { while moving }
+end;
+
+procedure setposition(channel : integer; angle : real);
+
+begin
+    Axis[channel].TargetAngle := angle;
+end;
+
+procedure ManualControl(joint : integer);
+var
+    quitflag : char;
+    direction, speed : integer;
+
+begin
+    quitflag := 'x';             { never this value in the loop }
+    direction := 0;
+    speed := 0;
+
+    gotoxy(10,14);
+    writeln('Quit, Faster, Slower, Reverse, Pause');
+    while quitflag <> 'q' do
+    begin
+        gotoxy(10,15);
+        writeln('Sensor reading ', ReadAnalogSensor(joint), '  ',GetDegrees(joint,ReadAnalogSensor(joint)):6:1);
+
+        SetMotor(joint,direction,1);
+        delay(speed);                           { motor on time }
+        SetMotor(joint,direction,0);
+        delay(10-speed);                        { motor off time }
+
+        if KeyPressed then
+        begin
+            quitflag := ReadKey;
+            case quitflag of
+                'f': speed := speed + 1;
+                's': speed := speed - 1;
+                'r': direction := direction + 1;
+                'p': speed := 0;
+            end;
+            if speed > 10 then speed := 10;
+            if speed < 0 then speed := 0;
+            if direction = 2 then direction := 0;
+        end;
+    end;
+    Axis[joint].TargetAngle := GetDegrees(joint,ReadAnalogSensor(joint));
+    ShowStats;
+end;
+
+procedure GetCalibration(channel : integer);
+
+var
+    i : integer;
+
+begin
+
+    for i := 1 to 5 do
+    begin
+        gotoxy(10,13);
+        writeln('Move joint ', channel, ' to ', Axis[channel].CalArray[1,i]:5:1, ' degrees');
+        ManualControl(channel);
+        Axis[channel].CalArray[2,i] := ReadAnalogSensor(channel);
+    end;
+    Axis[channel].TargetAngle := GetDegrees(channel,ReadAnalogSensor(channel));
+end;
+
+procedure ReadCalFromDisk(channel : integer);
+
+var
+    i : integer;
+    infile : Text;
+
+begin
+    case channel of
+        1: assign(infile, 'calx1.dat');
+        2: assign(infile, 'calx2.dat');
+        3: assign(infile, 'calx3.dat');
+        4: assign(infile, 'calx4.dat');
+    end;
+
+    FileMode := 0;                      {read only}
+    reset(infile);
+
+    readln(infile, Axis[channel].Name);
+    readln(infile, Axis[channel].MinAngle);
+    readln(infile, Axis[channel].MaxAngle);
+    for i := 1 to 5 do
+    begin
+         readln(infile, Axis[channel].CalArray[1,i], Axis[channel].CalArray[2,i]);
+    end;
+    readln(infile, Axis[channel].NegDirection);
+    readln(infile, Axis[channel].PosDirection);
+    readln(infile, Axis[channel].MinSpeed);
+    readln(infile, Axis[channel].MaxSpeed);
+    readln(infile, Axis[channel].DecelRange);
+    close(infile);
+end;
+
+procedure WriteCalToDisk(channel : integer);
+
+var
+    i : integer;
+    outfile : Text;
+
+begin
+    case channel of
+        1: assign(outfile, 'calx1.dat');
+        2: assign(outfile, 'calx2.dat');
+        3: assign(outfile, 'calx3.dat');
+        4: assign(outfile, 'calx4.dat');
+    end;
+    FileMode := 1;                      {write}
+    rewrite(outfile);
+
+    writeln(outfile, Axis[channel].Name);
+    writeln(outfile, Axis[channel].MinAngle);
+    writeln(outfile, Axis[channel].MaxAngle);
+    for i := 1 to 5 do
+    begin
+         writeln(outfile, Axis[channel].CalArray[1,i]:6:1, Axis[channel].CalArray[2,i]:6:1);
+    end;
+    writeln(outfile, Axis[channel].NegDirection);
+    writeln(outfile, Axis[channel].PosDirection);
+    writeln(outfile, Axis[channel].MinSpeed);
+    writeln(outfile, Axis[channel].MaxSpeed);
+    writeln(outfile, Axis[channel].DecelRange);
+    close(outfile);
+end;
+
+{---------------------------------------------------------------------------
+
+  Used by main program. Prints portions of the screen that don't change.
+
+---------------------------------------------------------------------------}
+
+procedure paintmenu;
+
+var
+   i : integer;
+
+begin
+     for i := 0 to 3 do
+     begin
+          gotoxy(20 * i + 2, 2);
+          writeln('Sensor');
+          gotoxy(20 * i + 2, 4);
+          writeln('Angle');
+     end;
+     gotoxy(10, 8);
+     writeln('1: Select channel 1');
+     gotoxy(10, 9);
+     writeln('2: Select channel 2');
+     gotoxy(10, 10);
+     writeln('3: Select channel 3');
+     gotoxy(10,11);
+     writeln('s: Set position for channel');
+     gotoxy(50, 8);
+     writeln('w : Write cal data to disk');
+     gotoxy(50, 9);
+     writeln('r : Recalibrate channel');
+     gotoxy(50, 10);
+     writeln('m : Manually move channel');
+
+     gotoxy(50, 11);
+     writeln('q : Quit');
+end;
+
+{----------------------- body of robot main program ----------------------}
+
+var
+    i, choice, channel : integer;
+    angle : real;
+    quitflag : char;
+    GraphDriver, GraphMode, ErrorCode : integer;
+
+begin
+{
+    GraphDriver := Detect;
+    InitGraph(GraphDriver, GraphMode, 'E:\TP\BGI');
+    ErrorCode := GraphResult;
+    if ErrorCode <> grOk then
+    begin
+        writeln('Graphics error: ', GraphErrorMsg(ErrorCode));
+        halt(1);
+    end;
+    CloseGraph;
+}
+    for i := 1 to 4 do
+    begin
+        ReadCalFromDisk(i);
+        SetMotor(i,0,0);
+        Axis[i].TargetAngle := GetDegrees(i,ReadAnalogSensor(i));
+	Axis[i].ActiveFlag := false;
+	Axis[i].MotorFlag := false;
+	Axis[i].CurrentSpeed := 0;
+    end;
+
+    channel := 1;
+{    cleardevice;  }
+    clrscr;
+    window(1,1,80,24);
+    paintmenu;
+    while quitflag <> 'q' do
+    begin
+        ShowStats;
+        motorcycle;
+        if KeyPressed then
+        begin
+            quitflag := ReadKey;
+
+            case quitflag of
+                 '1': channel := 1;
+                 '2': channel := 2;
+                 '3': channel := 3;
+                 's': begin
+                         angle := -1;
+                         gotoxy(10,15);
+                         write('Enter angle, -1 to exit         ');
+                         gotoxy(35,15);
+                         read(angle);
+                         if angle >= 0 then
+                                 SetPosition(channel,angle);
+                       end;
+                    'w': WriteCalToDisk(channel);            {write it back out}
+                    'r': GetCalibration(channel);            {calibrate sensor}
+                    'm': ManualControl(channel);
+            end;  { end case }
+            clrscr;
+            paintmenu;
+        end; {end keypressed }
+    end; {while choice < 8 }
+end.
+

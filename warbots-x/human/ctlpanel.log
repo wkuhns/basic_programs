@@ -1,0 +1,40 @@
+Line 43: Class GaugeLib.Gauge of control Gauge3 was not a loaded control class.
+Line 140: Class GaugeLib.Gauge of control Gauge2 was not a loaded control class.
+Line 159: Class GaugeLib.Gauge of control ActDirGauge was not a loaded control class.
+Line 204: Class GaugeLib.Gauge of control Gauge1 was not a loaded control class.
+Line 49: The property name _Version in Gauge3 is invalid.
+Line 50: The property name _ExtentX in Gauge3 is invalid.
+Line 51: The property name _ExtentY in Gauge3 is invalid.
+Line 52: The property name _StockProps in Gauge3 is invalid.
+Line 54: The property name InnerTop in Gauge3 is invalid.
+Line 55: The property name InnerLeft in Gauge3 is invalid.
+Line 56: The property name InnerRight in Gauge3 is invalid.
+Line 57: The property name InnerBottom in Gauge3 is invalid.
+Line 58: The property name Value in Gauge3 is invalid.
+Line 59: The property name NeedleWidth in Gauge3 is invalid.
+Line 146: The property name _Version in Gauge2 is invalid.
+Line 147: The property name _ExtentX in Gauge2 is invalid.
+Line 148: The property name _ExtentY in Gauge2 is invalid.
+Line 149: The property name _StockProps in Gauge2 is invalid.
+Line 151: The property name InnerTop in Gauge2 is invalid.
+Line 152: The property name InnerLeft in Gauge2 is invalid.
+Line 153: The property name InnerRight in Gauge2 is invalid.
+Line 154: The property name InnerBottom in Gauge2 is invalid.
+Line 155: The property name Max in Gauge2 is invalid.
+Line 156: The property name Value in Gauge2 is invalid.
+Line 157: The property name NeedleWidth in Gauge2 is invalid.
+Line 165: The property name _Version in ActDirGauge is invalid.
+Line 166: The property name _ExtentX in ActDirGauge is invalid.
+Line 167: The property name _ExtentY in ActDirGauge is invalid.
+Line 168: The property name _StockProps in ActDirGauge is invalid.
+Line 171: The property name Max in ActDirGauge is invalid.
+Line 172: The property name Style in ActDirGauge is invalid.
+Line 173: The property name NeedleWidth in ActDirGauge is invalid.
+Line 210: The property name _Version in Gauge1 is invalid.
+Line 211: The property name _ExtentX in Gauge1 is invalid.
+Line 212: The property name _ExtentY in Gauge1 is invalid.
+Line 213: The property name _StockProps in Gauge1 is invalid.
+Line 215: The property name Max in Gauge1 is invalid.
+Line 216: The property name Value in Gauge1 is invalid.
+Line 217: The property name Style in Gauge1 is invalid.
+Line 218: The property name NeedleWidth in Gauge1 is invalid.

@@ -1,0 +1,19 @@
+For hard-core programming types, here is the detail on the
+DOS function. You will need to read up on invoking DOS interrupts
+from your application.
+
+Interrupt 15h  [Cassette I/O]
+(0:0054h)       Renamed "System Services" on PS/2 line
+
+(Note from Bill Kuhns: I skipped Functions 00h through 83h )
+
+Function 84h    Read Joystick Input Settings                 (AT, XT/286, PS/2)
+entry   AH      84h
+        DX      00h     to read the current switch settings  (return in AL)
+                01h     to read the resistive inputs
+return  AX      A(X) value
+        BX      A(Y) value
+        CX      B(X) value
+        DX      B(Y) value
+        AL      switch settings (bits 7-4)
+

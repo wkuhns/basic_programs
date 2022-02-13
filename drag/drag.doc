@@ -1,0 +1,204 @@
+
+   This program suite is designed for analysis and
+optimization of the 'wind schedules' for the spring powered
+race car to be entered in the 1991 'Great American Drag
+Race'. 
+
+   The car is powered by winding a cord around a spindle on
+the drive axle. The spindle has 16 different diameters,
+allowing control of the torque applied to the drive wheels.
+In general, the cord is wound on successively smaller
+diameters as the wind progresses, compensating for the
+increased force as the springs are stretched out.
+
+   The car is configured with 4 springs. Each spring
+requires 8.6 pounds to begin stretching, and has a spring
+constant of 3.065 pounds per inch thereafter. Useable spring
+extension is 9 inches.
+
+   The problem is to determine how many revolutions of cord
+to wind on each spindle diameter in order to deliver the
+optimum power to the drive wheels throughout the run. The
+sequence of turns per diameter is called a 'wind schedule'.
+
+   Once the actual runs have been plotted, they can be
+analyzed to determine effective coefficients of friction
+(CF). For the purposes of this model, CF is defined as
+maximum possible acceleration force divided by total vehicle
+weight.
+
+   The optimizing portion of the program reads CF
+profiles from a file named GOALS.DAT. It will then generate
+a series of optimum wind schedules and analysis.
+
+   The file FORM.TXT contains the log form used to record
+actual run data. Information on various vehicle
+configurations is recorded at the bottom of the form.
+Information includes number of springs, axle station, weight
+location, and axle offset. 
+
+
+                    INPUT FILE FORMATS:
+
+PROFILE.DAT:
+
+	data type	example		explanation
+__________________________________________________________________
+
+	<NUMERIC>	4	Number of runs in this file
+	<NUMERIC>	1.9	Mass of vehicle in pounds
+	<NUMERIC>	4	Number of springs
+	<NUMERIC>	3.375	Tire diameter
+	<NUMERIC>	4	Drive ratio (pulleys)
+	<NUMERIC>	.85	Drivetrain efficiency
+
+FOR EACH RUN:
+
+	<STRING>	"A"	Run identifier
+	<STRING>	"F"	Vehicle configuration
+	<NUMERIC>	1.01	Elapsed time
+	<STRING>	"Good run"	Comments
+	<NUMERIC-1>	0	16 values, one per line -
+	    .		.	scale reading of transition
+	    .		.	to next segment, starting
+	    .		.	with the largest.
+	<NUMERIC-16>	123
+
+_________________________________________________________________
+
+GOALS.DAT:
+
+	data type	example		explanation
+__________________________________________________________________
+	
+	<NUMERIC>	4	Number of runs in this file
+	<NUMERIC>	1.9	Mass of vehicle in pounds
+	<NUMERIC>	4	Number of springs
+	<NUMERIC>	23.5	Maximum spring extension, cm
+	<NUMERIC>	3.375	Tire diameter
+	<NUMERIC>	4	Drive ratio (pulleys)
+	<NUMERIC>	.85	Drivetrain efficiency
+
+FOR EACH RUN:
+
+    20 lines of 6 numeric values each, containing
+coefficient of friction values (multipied by 50) separated
+by commas. Each line represents one foot of travel.
+
+    The following 21 lines are a valid input file.
+
+1,2.0,4,23.5,3.375,4,.85
+68,68,68,68,68,68
+68,68,68,68,68,68
+68,68,68,68,68,68
+68,68,68,68,68,68
+68,68,68,68,68,68
+68,68,68,68,68,68
+68,68,68,68,68,68
+68,68,68,68,68,68
+68,68,68,68,68,68
+68,68,68,68,68,68
+68,68,68,68,68,68
+68,68,68,68,68,68
+68,68,68,68,68,68
+68,68,68,68,68,68
+68,68,68,68,68,68
+68,68,68,68,68,68
+68,68,68,68,68,68
+68,68,68,68,68,68
+68,68,68,68,68,68
+68,68,68,68,68,68
+
+
+
+                   MODELING AND ANALYSIS
+
+   In order to acheive the fastest possible time, the torque
+delivered to the drive wheels must be just short of the
+amount necessary to break traction at all times, and the
+entire weight of the vehicle must be on the drive wheels.
+
+   In order to achieve this, two adjustments are necessary:
+vehicle center of gravity and applied torque. In addition,
+drivetrain effeciency and the effective coefficient of
+friction between the drive wheels and the track surface must
+be known.
+
+   Knowing the spring constants, vehicle weight, and
+drivetrain ratios, it is easy to calculate the maximum
+possible acceleration. This model assumes that actual
+acceleration is degraded by drivetrain loss and limited by
+coefficient of friction, and attempts to infer values for
+these parameters.
+
+   This model makes some broad assumptions:
+
+     o	Drivetrain efficiency is constant.
+     o	Aerodynamic effects are negligible.
+     o	Wheelspin is insignificant
+
+   The first parameter that must be determined is drivetrain
+efficiency. Make several runs with a somewhat conservative
+wind schedule (to ensure no wheelspin). Use the program,
+adjusting the efficiency value until the actual and
+theoretical accelerations match for the run segments with
+the highest actual acceleration values. Use the resultant
+efficiency value for all subsequent analysis.
+
+   The next step is to derive effective CF values. CF is
+affected by vehicle CG, dynamic weight transfer, and
+vibration, in addition to the physical limits of the tire
+and track materials.
+
+   Progress gradually to more aggressive wind schedules. At
+some point, actual acceleration values for some segments
+will start to fall below the calculated values. This
+indicates that the CF value for that segment has been
+exceeded.
+
+   The torque profile is in inch-ounces of actual torque at
+the drive wheels. Each print column represents 2" of ground
+travel. The horizontal scale is in feet, with 21 feet at the
+right edge.
+
+   In optimization mode, the data at the top represents the
+input data. There are two 'Extension' values: the first is
+the maximum allowable extension, and the second is the
+optimum extension for the calculated wind sequence. 
+
+   The graph will be as for the 'analysis' mode, but the
+desired torque profile will be shown as '+' characters.
+
+   There is a strip chart at the bottom of the graph, which
+can be used to wind the car. The strip chart is cut from the
+graph and attached to the car, with the ^ symbol at the zero
+point of the springs. Each successive mark shows the
+extension at which the wind changes to the next smaller
+diameter. The 'A' mark shows the final extension on the last
+diameter (if the last diameter is used). 
+
+
+THEORETICAL PERFORMANCE CALCULATIONS:
+
+   The program will calculate the theoretical elapsed time
+and velocity of the car at the 1.25, 5, 11.25, and 20 foot points.
+This data is obtained by determining the force applied to
+the car during each 2" interval and calculating the
+resultant time required and incremental change in velocity
+for that distance. The 2" increments are summed and printed
+at each interval.
+
+   The input file contains coefficient of friction values
+for 2" increments of travel (multiplied by 50). These values
+are plotted as '+' symbols.
+
+   These values are combined with vehicle mass, drivetrain
+efficiency, and tire diameter data to obtain the theoretical
+torque required to break traction. A wind schedule is then
+generated to provide this torque profile.
+
+   Torques resulting from this wind schedule are multiplied
+by drivetrain efficiency, and limited by the value of CF. 
+Resulting effective drive wheel torques are printed as '*'
+symbols.
+

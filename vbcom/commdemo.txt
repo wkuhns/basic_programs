@@ -1,0 +1,224 @@
+Sub Form_Load ()
+
+    Initialize
+
+    Menu_Comm_Connect.Visible = TRUE
+    Menu_Comm_Disconnect.Visible = FALSE
+    
+    offset = 200
+
+    CaptionLeft = offset
+    CaptionTop = offset
+    CaptionWidth = ScaleWidth - CaptionLeft - offset
+    CaptionHeight = TextHeight("qypgjXAQK") * 1.5
+
+    UpdateCaption " Ready", 0
+
+    Left = (Screen.width - width) / 2
+    top = Height - ScaleHeight
+    Height = top + CaptionTop + CaptionHeight + offset
+
+End Sub
+
+
+Sub Menu_File_Exit_Click ()
+
+    Unload CommDemo
+
+End Sub
+
+Sub Menu_Comm_Connect_Click ()
+
+    UpdateCaption " Opening Comm Port... " + CommPortName, .5
+
+    CommTBBuffer = PostTBBuffer
+    CommRBBuffer = PostRBBuffer
+    CommPortName = PostPortName
+
+    CommHandle = OpenComm(CommPortName, CommRBBuffer, CommTBBuffer)
+
+    If CommHandle = -2 Then
+        result% = MsgBox("Port already Open!" + Chr$(13) + "Do you want to use it anyway ?", 4 + 16 + 256, "Communication Sampler II")
+        
+        If result% = 6 Then
+            ApiErr% = CloseComm(0)
+            CommHandle = OpenComm(CommPortName, CommRBBuffer, CommTBBuffer)
+        End If
+    End If
+
+    If CommHandle < 0 Then
+        UpdateCaption " OpenComm() API Failed! (ERR " + Str$(CommHandle) + ")", .5
+    Else
+        Menu_Windows.enabled = TRUE
+        Menu_Window_Receive_Transmit.Checked = TRUE
+
+        Receive.Show
+        
+        CommEventMask = PostEventMask
+        CommDeviceNum = Val(Mid$(CommPortName, 4, 1))
+        ApiErr% = SetCommEventMask(CommHandle, CommEventMask)
+
+        PostState = CommState
+        CommState.Id = Chr$(CommHandle)
+
+        ApiErr% = SetCommState(CommState)
+
+        Menu_Comm_Connect.Visible = Menu_Comm_Disconnect.Visible
+        Menu_Comm_Disconnect.Visible = Not Menu_Comm_Connect.Visible
+        UpdateCaption " Commuications Port Opened...", .5
+        DisplayQBOpen CommState, CommPortName, CommRBBuffer, CommTBBuffer, CommReadInterval
+
+        CommReadInterval = PostReadInterval
+        Receive.Receive_Timer.interval = CommReadInterval
+    End If
+
+End Sub
+
+Sub Menu_Comm_Disconnect_click ()
+
+    UpdateCaption " Closing Communication Port...", 0
+
+    Receive.Receive_Timer.interval = 0
+
+    ApiErr% = CloseComm(CommHandle)
+    CommHandle = -1
+    CommDeviceNum = -1
+    
+    Menu_Comm_Disconnect.Visible = Menu_Comm_Connect.Visible
+    Menu_Comm_Connect.Visible = Not Menu_Comm_Disconnect.Visible
+    
+    Menu_Windows.enabled = FALSE
+    Unload Receive
+    
+    UpdateCaption " Ready", 0
+
+End Sub
+
+Sub Form_Unload (Cancel As Integer)
+
+    If CommHandle > -1 Then
+        Menu_Comm_Disconnect_click
+    End If
+
+
+    UpdateCaption " Terminating Communication Sampler II...", .5
+
+End Sub
+
+Sub Menu_Comm_Send_CRLF_Click ()
+    Menu_Comm_Send_CRLF.Checked = Not Menu_Comm_Send_CRLF.Checked
+End Sub
+
+Sub Initialize ()
+    
+    IndexTrans = 0
+    IndexReceive = 0
+    
+    CommHandle = -1
+    CommDeviceNum = -1
+    
+    ' Default Port Settings
+
+    CommPortName = "COM1:"
+    CommState.BaudRate = 9600
+    CommState.ByteSize = Chr$(8)
+    CommState.Parity = Chr$(0)
+    CommState.StopBits = Chr$(0)
+    
+    ' Default Line Settings
+
+    CommRBBuffer = 2048
+    CommTBBuffer = 2048
+    CommState.RlsTimeOut = 0
+    CommState.CtsTimeOut = 0
+    CommState.DsrTimeOut = 0
+    CommEventMask = &H3FF
+    CommReadInterval = 500
+
+    ' Post-Poned settings
+
+    PostRBBuffer = CommRBBuffer
+    PostTBBuffer = CommTBBuffer
+    PostEventMask = CommEventMask
+    PostState = CommState
+    PostReadInterval = CommReadInterval
+    PostPortName = CommPortName
+
+End Sub
+
+Sub Menu_Settings_Port_Click ()
+    
+    UpdateCaption " Loading Dialog...", 0
+
+    PortDlg.Show 1
+
+    If Menu_Comm_Connect.Visible = TRUE Then
+        UpdateCaption " Ready ", 0
+    Else
+        UpdateCaption " Communication Port Open...", 0
+    End If
+
+End Sub
+
+Sub Menu_Settings_Event_Click ()
+    
+    UpdateCaption " Loading Dialog...", 0
+    
+    EventDlg.Show 1
+    
+    If Menu_Comm_Connect.Visible = TRUE Then
+        UpdateCaption " Ready ", 0
+    Else
+        UpdateCaption " Communication Port Open...", 0
+    End If
+
+End Sub
+
+Sub Menu_Settings_Line_Click ()
+
+    UpdateCaption " Loading Dialog...", 0
+    
+    LineDlg.Show 1
+    
+    If Menu_Comm_Connect.Visible = TRUE Then
+        UpdateCaption " Ready ", 0
+    Else
+        UpdateCaption " Communication Port Open...", 0
+    End If
+    
+End Sub
+
+Sub Form_Paint ()
+    
+    Draw3d CaptionLeft, CaptionTop, CaptionWidth, CaptionHeight, CommDemo
+    UpdateCaption CaptionText$, 0
+
+End Sub
+
+Sub Menu_Window_Receive_Transmit_Click ()
+
+    Menu_Window_Receive_Transmit.Checked = Not Menu_Window_Receive_Transmit.Checked
+    
+    If Menu_Window_Receive_Transmit.Checked = TRUE Then
+        Receive.Show
+        Receive.Receive_Timer.interval = CommReadInterval
+    Else
+        Receive.Hide
+    End If
+
+End Sub
+
+Sub Menu_File_About_Click ()
+    
+    UpdateCaption " Loading Dialog...", 0
+
+    AboutDlg.Show 1
+
+    If Menu_Comm_Connect.Visible = TRUE Then
+        UpdateCaption " Ready ", 0
+    Else
+        UpdateCaption " Communication Port Open...", 0
+    End If
+
+End Sub
+

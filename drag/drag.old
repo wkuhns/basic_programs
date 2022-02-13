@@ -1,0 +1,519 @@
+Attribute VB_Name = "Module1"
+Option Explicit
+
+Public mass As Single
+Public nsprings As Integer
+Public eff As Single
+Public tire_dia As Single
+Public ratio As Single
+Public mu As Single
+Public maxext As Single
+
+    Dim dias(16)  As Single                   ' Lookup table of spindle diameters
+    Dim turns(16)  As Single                  ' Turns per diameter (wind schedule)
+    Dim runs(16)  As Single                   ' Inches ground travel per cord inch
+    Dim dists(16)  As Single                  ' Ground travel for this diameter
+    Dim inches(16)  As Single                 ' Cum. inches at end of segment
+    
+    Dim torques(200)  As Single               ' Drive torques at 2" increments
+    Dim goals(200) As Single
+    Dim tgoals(200) As Single
+    Dim screen$(80, 132)            ' Graph image
+    Dim chart(2, 132) As String * 1              ' Windup chart strip
+
+
+Sub makechart()
+'
+'*******************************************************************
+'!
+'!   Create windup chart at bottom of graph
+'!
+'!*******************************************************************
+    ptr_cpi = 13.62                 ' char/in for ln03r in landscape
+
+    cell = (ext / 2.54) * ptr_cpi
+    cell = Int(cell + 0.5)
+
+    If cell < 0 Then
+        cell = 0
+    End If
+
+    chart(1, cell) = "|"
+    chart(2, cell) = Chr$(seg + 64)
+
+End Sub
+
+'*******************************************************************
+'
+'   Create output graph
+'
+'*******************************************************************
+Sub GRAPH_TORQUES()
+
+    For Row = 0 To 80                       ' Clear graph
+        For Col = 1 To 132
+            screen$(Row, Col) = " "
+        Next Col
+    Next Row
+
+    '***************************************************************
+    '   Paint frame
+    '***************************************************************
+
+    For Col = 4 To 130 Step 6
+        screen$(9, Col) = "|"
+        screen$(61, Col) = "|"
+        xlabel = mod(((col-4)/6),10)
+        screen$(8, Col) = Str$(xlabel)
+        screen$(62, Col) = Str$(xlabel)
+    Next Col
+
+    For Row = 10 To 60 Step 10
+        For Col = 3 To 132
+            screen$(Row, Col) = "-"
+        Next Col
+    Next Row
+
+    screen$(60, 1) = "9"
+    screen$(60, 2) = "5"
+
+    screen$(50, 1) = "8"
+    screen$(50, 2) = "5"
+
+    screen$(40, 1) = "7"
+    screen$(40, 2) = "5"
+
+    screen$(30, 1) = "6"
+    screen$(30, 2) = "5"
+
+    screen$(20, 1) = "5"
+    screen$(20, 2) = "5"
+
+    screen$(10, 1) = "4"
+    screen$(10, 2) = "5"
+
+    For x = 1 To 128                         ' place goal points in graph
+        xpos = Int(goals(x) - 34.5)
+        If xpos < 0 Then            ' limit check
+            xpos = 0
+        End If
+        If xpos > 80 Then           ' limit check
+            xpos = 80
+        End If
+        screen$(xpos, x + 4) = "+"
+    Next x
+
+'
+    For x = 1 To 128                        ' place torque points in graph
+
+!acc = ((torques(x) * eff) / (tire_dia / 2) / mass) * 2
+!xpos = Int(acc - 35)
+        xpos = Min(torques(x), tgoals(x)) * eff
+        xpos = Int(xpos + 0.5) - 35
+        If xpos < 0 Then            ' limit check
+            xpos = 0
+        End If
+        If xpos > 80 Then           ' limit check
+            xpos = 80
+        End If
+        screen$(xpos, x + 4) = "*"
+    Next x
+
+    '***************************************************************
+    '   Place theoretical data in graph
+    '***************************************************************
+
+    For x = 1 To 5
+        screen$(13, 8 + x) = Mid$(ta$, x, 1)
+        screen$(12, 8 + x) = Mid$(aa$, x, 1)
+        screen$(11, 8 + x) = Mid$(va$, x, 1)
+
+        screen$(13, 31 + x) = Mid$(tb$, x, 1)
+        screen$(12, 31 + x) = Mid$(ab$, x, 1)
+        screen$(11, 31 + x) = Mid$(VB$, x, 1)
+
+        screen$(13, 68 + x) = Mid$(tc$, x, 1)
+        screen$(12, 68 + x) = Mid$(ac$, x, 1)
+        screen$(11, 68 + x) = Mid$(vc$, x, 1)
+
+        screen$(13, 121 + x) = Mid$(td$, x, 1)
+        screen$(12, 121 + x) = Mid$(ad$, x, 1)
+        screen$(11, 121 + x) = Mid$(vd$, x, 1)
+    Next x
+    
+Return
+
+End Sub
+
+
+
+'*******************************************************************
+'
+'   Create and initialize various tables used in program
+'
+'*******************************************************************
+
+Sub MAKE_TABLES()
+
+    dias(1) = 0.2688                ' Initialize with actual diameters
+    dias(2) = 0.2889
+    dias(3) = 0.3106
+    dias(4) = 0.3339
+    dias(5) = 0.3589
+    dias(6) = 0.3858
+    dias(7) = 0.4148
+    dias(8) = 0.4459
+    dias(9) = 0.4793
+    dias(10) = 0.5153
+    dias(11) = 0.5539
+    dias(12) = 0.5954
+    dias(13) = 0.6401
+    dias(14) = 0.6881
+    dias(15) = 0.7397
+    dias(16) = 0.7952
+
+End Sub
+
+Sub INIT_TABLES()
+
+Dim x As Integer
+
+    For x = 0 To 200
+        goals(x) = 0
+    Next x
+
+    For x = 0 To 132
+        chart(1, x) = " "
+        chart(2, x) = " "
+    Next x
+    chart(1, 0) = "|"
+    chart(2, 0) = "^"
+   
+ '  seq$ = ""
+
+End Sub
+
+
+
+'*******************************************************************
+'
+'   Read in desired torque profiles
+'
+'*******************************************************************
+Sub GET_GOALS()
+        
+Dim x As Integer
+
+    For x = 0 To 114 Step 6             ' build table in 2" increments
+        Input #1, goals(x), goals(x + 1), goals(x + 2), goals(x + 3), goals(x + 4), goals(x + 5)
+    Next x
+
+    For x = 0 To 119
+        tgoals(x) = (goals(x) * mass * tire_dia * 0.16) / eff
+    Next x
+
+    For x = 120 To 200          ' Extend last goal to end of table
+        goals(x) = goals(119)
+        tgoals(x) = tgoals(119)
+    Next x
+
+End Sub
+
+'*******************************************************************
+'
+'  Calculate optimized wind schedule
+'
+'******************************************************************
+Sub CALC_WINDS()
+
+    For x = 1 To 16
+        turns(x) = 0
+    Next x
+
+    '***************************************************************
+    '   Various vehicle parameters in english / metric hybrid
+    '***************************************************************
+
+    sconst = (3.065 / 2.54) * 16 * nsprings             ' in oz-cm
+    sconst = sconst / drive_ratio
+    offset = (nsprings * 8.6 * 16) / drive_ratio        ' in oz
+
+    '***************************************************************
+    '   Initial condition is vehicle with springs fully extended
+    '   and cord on smallest spindle diameter
+    '***************************************************************
+
+    travel = 0                                  ' ground travel in inches
+    seg = 1                                     ' seg 1 is smallest
+
+    ext = maxext
+    torque = ((ext * sconst) + offset) * (dias(seg) / 2)
+    goal = tgoals(0)
+
+'
+    '***************************************************************
+    '   If torque is too low, move to larger spindle diameters. Each
+    '   Diameter is 7.5% more torque, so we start 4% high.
+    '***************************************************************
+
+    While (torque < (goal * 1.04))
+        seg = seg + 1
+        torque = ((ext * sconst) + offset) * (dias(seg) / 2)
+    Next
+
+    '***************************************************************
+    '   We now have at least enough torque. Unwind 1mm at a time
+    '   until we are OK.
+    '***************************************************************
+
+    While (torque > (goal * 1.04))
+        ext = ext - 0.1
+        torque = ((ext * sconst) + offset) * (dias(seg) / 2)
+    Next
+    actext = ext
+
+    '***************************************************************
+    '   Now we do the work. CALC_SEG determines the best spindle
+    '   segment by balancing torque errors.
+    '   Each increment is 1/4 tire rotation.
+    '***************************************************************
+
+    finished = False
+
+    While (finished = False)
+        GoSub CALC_SEG                  ' Call twice to skip a segment
+         CALC_SEG                  ' if needed
+        turns(seg) = turns(seg) + 0.25
+        ext = ext - (dias(seg) * 3.1416 * 2.54 * 0.25) / drive_ratio
+        travel = travel + 3.1416 * tire_dia * 0.25
+    Next
+
+End Sub
+
+
+'*******************************************************************
+'
+'   Given a wind schedule, calculate the actual torques delivered
+'   to the rear wheels
+'
+'*******************************************************************
+Sub CALC_TORQUES()
+
+    sconst = (3.065 / 2.54) * 16 * nsprings     ' in oz-cm
+    sconst = sconst / drive_ratio
+    offset = (nsprings * 8.6 * 16) / drive_ratio    ' in oz
+
+'
+    '***************************************************************
+    '   DISTS() is the ground distance traveled on each spindle
+    '   diameter.
+    '***************************************************************
+
+    travel = 0
+    For x = 1 To 16
+        dists(x) = 3.1416 * tire_dia * turns(x)     ' Calculate DISTS()
+        travel = travel + dists(x)
+    Next x
+
+    ext = 0
+    For x = 16 To 1 Step -1
+        ext = ext + turns(x) * dias(x) * 3.1416 / drive_ratio
+    Next x
+    calcext = ext * 2.54 + 0.33
+
+    '***************************************************************
+    '   Calculate the torque delivered to the wheels at 2" increments of
+    '   ground travel. Torque is a function of spring extension and spindle
+    '   diameter.
+    '***************************************************************
+
+    travel = 0
+    dist = 0
+    seg = 0
+
+    rot_incr = 1 / (tire_dia * 3.1416)
+
+    ext = actext                    ' Actual extension is in cm
+
+    '***************************************************************
+    '   MASS, V_I, and E_T are used in theoretical performance
+    '   calculations. See drag.doc for details.
+    '***************************************************************
+
+    v_i = 0
+    e_t = 0
+
+    For inch = 1 To 400
+        x = Int(inch / 2)
+        While ((dist < 1) And (seg < 16)) ' Accumulate at least 1" of travel
+            seg = seg + 1                   ' by traversing empty segments
+            dist = dist + dists(seg)    ' until you find enough DISTance
+             chart
+        Next
+
+                                    ' If you have any cord left, calculate
+                                    ' torque as a function of spring force
+                                    ' and spindle diameter.
+
+        If dist >= 1 Then
+            torques(x) = (ext * sconst + offset) * (dias(seg) / 2)
+            dist = dist - 1         ' Decrement remaining distance
+            ext = ext - (dias(seg) * 3.1416 * rot_incr * 2.54) / drive_ratio
+        Else
+            torques(x) = 0
+        End If
+
+'
+    '***************************************************************
+    '   Theoretical calculations mentioned above.
+    '***************************************************************
+
+        If goals(x) > 1 Then            ' goals null during analyze
+            force = Min(torques(x), tgoals(x))
+            force = force / (tire_dia / 2)
+        Else
+            force = torques(x)
+        End If
+        force = force * eff
+
+        acc = (force / mass) * 2
+        If acc > 0 Then
+            d_t = (sqrt(v_i * v_i + 2 * acc / 12) - v_i) / acc
+        Else
+            d_t = 1 / v_i / 12
+        End If
+        e_t = e_t + d_t
+        v_i = v_i + acc * d_t
+
+        If inch = 15 Then
+            a_a = 2.5 / (e_t * e_t)
+            aa$ = Format$(a_a, "##.##")
+            ta$ = Format$(e_t, "#.###")
+            va$ = Format$(v_i, "##.##")
+            eta = e_t
+            vel = v_i
+        End If
+
+        If inch = 60 Then
+            etb = e_t - eta
+            a_b = 2 * (3.75 - (vel * etb)) / (etb * etb)
+            ab$ = Format$(a_b, "##.##")
+            tb$ = Format$(etb, "#.###")
+            VB$ = Format$(v_i, "##.##")
+            vel = v_i
+        End If
+
+        If inch = 135 Then
+            etc = e_t - etb - eta
+            a_c = 2 * (6.25 - (vel * etc)) / (etc * etc)
+            ac$ = Format$(a_c, "##.##")
+            tc$ = Format$(etc, "#.###")
+            vc$ = Format$(v_i, "##.##")
+            vel = v_i
+        End If
+
+        If inch = 240 Then
+            etd = e_t - etc - etb - eta
+            a_d = 2 * (8.75 - (vel * etd)) / (etd * etd)
+            ad$ = Format$(a_d, "##.##")
+            td$ = Format$(etd, "#.###")
+            vd$ = Format$(v_i, "##.##")
+            net_acc = 40 / (e_t * e_t)
+            net_acc$ = Format$(net_acc, "##.##")
+            et$ = Format$(e_t, "#.###")
+        End If
+    Next inch
+End Sub
+
+
+'*******************************************************************
+'
+'   Write graph to disk
+'
+'*******************************************************************
+Sub WRITE_GRAPH()
+
+'    margin #2%, 132
+    Print #2, run$
+    Print #2, ""
+    Print #2, ""
+    Print #2, ""
+    Print #2, ""
+    Print #2, "Run: "; run$;
+    Print #2, "   Mass: "; mass;
+    Print #2, "   Tire: "; tire_dia;
+    Print #2, "   Ratio: "; drive_ratio;
+    Print #2, "   Springs: "; nsprings;
+    Print #2, "   Ext: "; ext$;
+    Print #2, "   Acc: "; net_acc$;
+    Print #2, "   Eff: "; eff;
+    Print #2, "   Time: "; et$;
+    Print #2,
+    Print #2,
+    For Row = 62 To 8 Step -1
+        For Col = 1 To 132
+            Print #2, screen$(Row, Col);
+        Next Col
+        Print #2,
+    Next Row
+    Print #2,
+
+    For x = 0 To 130
+        Print #2, chart(1, x);
+    Next x
+    Print #2,
+    For x = 0 To 130
+        Print #2, chart(2, x);
+    Next x
+
+    Print #2, Chr$(12)
+
+End Sub
+
+'*******************************************************************
+'
+'   Determine ideal segment based on minimizing torque errors
+'
+'*******************************************************************
+Sub CALC_SEG()
+
+    If (turns(16) = 3) Or (ext <= 0) Then
+        finished = True
+    End If
+
+    If (finished = True) Or (seg = 16) Then
+        GoTo DONE_CALC_SEG
+    End If
+
+    '***************************************************************
+    '   GOAL1 is desired torque at start of this increment. GOAL2 is
+    '   desired torque at end of this increment.
+    '***************************************************************
+
+    goal1 = tgoals(Int(travel / 2))         ' Each goal unit is 2"
+    goal2 = tgoals(Int((travel + (tire_dia * 3.1416 * 0.25)) / 2))
+
+'
+    '***************************************************************
+    '   ERROR1 is the maximum torque error if we stay on the current
+    '   segment. ERROR2 is the max error if we move to the next.
+    '***************************************************************
+
+    torque1 = ((ext * sconst) + offset) * (dias(seg) / 2)
+    ext2 = ext - (dias(seg) * 3.1416 * 0.25 / drive_ratio)
+    torque2 = ((ext2 * sconst) + offset) * (dias(seg) / 2)
+    error1 = Abs(torque1 - goal1) + Abs(torque2 - goal2)
+
+    torque3 = ((ext * sconst) + offset) * (dias(seg + 1) / 2)
+    ext2 = ext - (dias(seg + 1) * 3.1416 * 0.25 / drive_ratio)
+    torque4 = ((ext2 * sconst) + offset) * (dias(seg + 1) / 2)
+    error2 = Abs(torque3 - goal1) + Abs(torque4 - goal2)
+
+    If (error1 > error2) Then
+        seg = seg + 1
+    End If
+
+DONE_CALC_SEG:
+
+End Sub
+

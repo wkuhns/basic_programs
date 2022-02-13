@@ -1,0 +1,225 @@
+01 01 "Present             " "Faults?             " "                    " "                    " 
+     "YES" 04 01       "NO"  01 02       "DOWN" 01 02        "UP"  01 05 
+
+01 02 "Fault History       " "By Leg?             " "                    " "                    " 
+     "YES" 05 01       "NO"  01 03       "DOWN" 01 03        "UP"   01 01
+
+01 03 "Rigging Help?       " "                    " "                    " "                    " 
+     "YES" 18 01        "NO"  01 04       "DOWN" 01 04        "UP"  01 02
+
+01 04 "System              " "Status?             " "                    " "                    " 
+     "YES" 03 01       "NO"  01 05       "DOWN" 01 05        "UP"  01 03 
+
+01 05 "Erase Fault         " "History?            " "                    " "                    " 
+     "NO"  01 01       "DOWN" 01 01        "UP"  01 04 
+
+20 01 "PSEU PROXIMITY   1/4" "CHANNELS?           " "                    " "                    " 
+     "YES" 03 01        "NO"  20 02       "DOWN" 20 02        "UP"  20 04      "MENU" 01 01
+
+20 02 "PSEU DISCRETE    2/4" "OUTPUTS?            " "                    " "                    " 
+     "YES" 02 01        "NO"  20 03       "DOWN" 20 03        "UP"  20 01      "MENU" 01 01
+
+20 03 "PSEU DISCRETE    3/4" "INPUTS?             " "                    " "                    " 
+     "YES" 24 01        "NO"  20 04       "DOWN" 20 04        "UP"  20 02      "MENU" 01 01
+
+20 04 "FAULT HISTORY    4/4" "BY CHANNEL?         " "                    " "                    " 
+     "YES" 12 01        "NO"  20 01       "DOWN" 20 01        "UP"  20 03      "MENU" 01 01
+
+04 01 "NLG_POSITION        " "PROX_SENS_OPEN      " "                    " "                    " 
+     "DOWN" 04 02        "UP"  04 02      "MENU" 01 01
+
+04 02 "END_OF_PRESENT      " "FAULTS              " "                    " "                    " 
+     "DOWN" 04 01        "UP"  04 01	  "MENU" 01 01
+
+05 01 "FAULT HISTORY:   1/7" "11 FAULTS           " "                    " "                    " 
+     "DOWN" 05 02        "UP"  05 07      "MENU" 01 02
+
+05 02 "FAULTS FOR LEG   2/7" "NUMBER 1?           " "                    " "                    " 
+     "YES" 06 01        "NO"  05 03        "DOWN" 05 03        "UP"  05 01      "MENU" 01 02
+
+05 03 "FAULTS FOR LEG   3/7" "NUMBER 2?           " "                    " "                    " 
+     "YES" 07 01        "NO"  05 04        "DOWN" 05 04        "UP"  05 02      "MENU" 01 02
+
+05 04 "FAULTS FOR LEG   4/7" "NUMBER 3?           " "                    " "                    " 
+     "YES" 08 01        "NO"  05 05        "DOWN" 05 05        "UP"  05 03      "MENU" 01 02
+
+05 05 "FAULTS FOR LEG   5/7" "NUMBER 4?           " "                    " "                    " 
+     "YES" 09 01        "NO"  05 06        "DOWN" 05 06        "UP"  05 04      "MENU" 01 02
+
+05 06 "FAULTS FOR LEG   6/7" "NUMBER 32?          " "                    " "                    " 
+     "YES" 10 01        "NO"  05 07        "DOWN" 05 07        "UP"  05 05      "MENU" 01 02
+
+05 07 "END OF FAULT     7/7" "HISTORY             " "                    " "                    " 
+     "DOWN" 05 01        "UP"  05 06      "MENU" 01 02
+
+06 01 "FLIGHT LEG 1     1/5" "03 FAULTS           " "                    " "                    " 
+     "DOWN" 06 02        "UP"  05 03      "MENU" 01 02
+
+06 02 "NGUL             2/5" "SENSOR OPEN G       " "                    " "                    " 
+     "DOWN" 06 03        "UP"  06 01      "MENU" 01 02
+
+06 03 "NGDL             3/5" "SMALL GAP (.04)     " "                    " "                    " 
+     "DOWN" 06 04        "UP"  06 02      "MENU" 01 02
+
+06 04 "NGDL             4/5" "BOARD A1 F1 A       " "                    " "                    " 
+     "DOWN" 06 05        "UP"  06 03      "MENU" 01 02
+
+06 05 "END OF HISTORY   5/5" "FLIGHT LEG 1        " "                    " "                    " 
+     "DOWN" 05 03        "UP"  06 04      "MENU" 01 02
+
+07 01 "FLIGHT LEG 2     1/5" "03 FAULTS           " "                    " "                    " 
+     "DOWN" 07 02        "UP"  05 04      "MENU" 01 02
+
+07 02 "NGUL             2/5" "SENSOR OPEN A       " "                    " "                    " 
+     "DOWN" 07 03        "UP"  07 01      "MENU" 01 02
+
+07 03 "NGUL             3/5" "SMALL GAP (.01) A   " "                    " "                    " 
+     "DOWN" 07 04        "UP"  07 02      "MENU" 01 02
+
+07 04 "NGDL             4/5" "SMALL GAP (.04) G   " "                    " "                    " 
+     "DOWN" 07 05        "UP"  07 03      "MENU" 01 02
+
+07 05 "END OF HISTORY   5/5" "FLIGHT LEG 2        " "                    " "                    " 
+     "DOWN" 05 04        "UP"  07 04      "MENU" 01 02
+
+08 01 "FLIGHT LEG 3     1/4" "02 FAULTS           " "                    " "                    " 
+     "DOWN" 08 02        "UP"  05 05      "MENU" 01 02
+
+08 02 "NGUL             2/4" "SMALL GAP (.02) A   " "                    " "                    " 
+     "DOWN" 08 03        "UP"  08 01      "MENU" 01 02
+
+08 03 "NGDL             3/4" "SMALL GAP (.04) G   " "                    " "                    " 
+     "DOWN" 08 04        "UP"  08 02      "MENU" 01 02
+
+08 04 "END OF HISTORY   4/4" "FLIGHT LEG 3        " "                    " "                    " 
+     "DOWN" 05 05        "UP"  08 03      "MENU" 01 02
+
+09 01 "FLIGHT LEG 4     1/4" "02 FAULTS           " "                    " "                    " 
+     "DOWN" 09 02        "UP"  05 06      "MENU" 01 02
+
+09 02 "NGUL             2/4" "SMALL GAP (.02) A   " "                    " "                    " 
+     "DOWN" 09 03        "UP"  09 01      "MENU" 01 02
+
+09 03 "NGDL             3/4" "SMALL GAP (.04) G   " "                    " "                    " 
+     "DOWN" 09 04        "UP"  09 02      "MENU" 01 02
+
+09 04 "END OF HISTORY   4/4" "FLIGHT LEG 4        " "                    " "                    " 
+     "DOWN" 05 06        "UP"  09 03      "MENU" 01 02
+
+10 01 "FLIGHT LEG 32    1/3" "01 FAULTS           " "                    " "                    " 
+     "DOWN" 10 02        "UP"  05 07      "MENU" 01 02
+
+10 02 "LGUL             2/3" "LARGE GAP (.18) A   " "                    " "                    " 
+     "DOWN" 10 03        "UP"  10 01      "MENU" 01 02
+
+10 03 "END OF HISTORY   3/3" "FLIGHT LEG 32       " "                    " "                    " 
+     "DOWN" 05 07        "UP"  10 02      "MENU" 01 02
+
+11 01 "SELF TEST:      1/11" "BITE OK             " "                    " "                    " 
+     "YES"  20 01       "DOWN" 11 02        "UP"  11 11      "MENU" 01 04
+
+11 02 "SELF TEST:      2/11" "PSC 1A OK           " "                    " "                    " 
+     "DOWN" 11 03        "UP"  11 01      "MENU" 01 04
+
+11 03 "SELF TEST:      3/11" "PSC 1B OK           " "                    " "                    " 
+     "DOWN" 11 04        "UP"  11 02      "MENU" 01 04
+
+11 04 "SELF TEST:      4/11" "LGUL SENSOR OK      " "                    " "                    " 
+     "DOWN" 11 05        "UP"  11 03      "MENU" 01 04
+
+11 05 "SELF TEST:      5/11" "LGDL SENSOR OK      " "                    " "                    " 
+     "DOWN" 11 06        "UP"  11 04      "MENU" 01 04
+
+11 06 "SELF TEST:      6/11" "LDOOR SENSOR OK     " "                    " "                    " 
+     "DOWN" 11 07        "UP"  11 05      "MENU" 01 04
+
+11 07 "SELF TEST:      7/11" "RGUL SENSOR OK      " "                    " "                    " 
+     "DOWN" 11 08        "UP"  11 06      "MENU" 01 04
+
+11 08 "SELF TEST:      8/11" "RGDL SENSOR OK      " "                    " "                    " 
+     "DOWN" 11 09        "UP"  11 07      "MENU" 01 04
+
+11 09 "SELF TEST:      9/11" "RDOOR SENSOR OK     " "                    " "                    " 
+     "DOWN" 11 10        "UP"  11 08      "MENU" 01 04
+
+11 10 "SELF TEST:     10/11" "NGUL SENSOR OK      " "                    " "                    " 
+     "DOWN" 11 11        "UP"  11 09      "MENU" 01 04
+
+11 11 "SELF TEST:     11/11" "NGDL SENSOR OK      " "                    " "                    " 
+     "DOWN" 11 01        "UP"  11 10      "MENU" 01 04
+
+12 01 "NON - SENSOR     1/4" "FAULTS  (NONE)      " "                    " "                    " 
+     "NO"  12 02        "DOWN" 12 02        "UP"  12 04      "MENU" 01 04
+
+12 02 "LEFT MAIN GEAR?  2/4" "(6 FAULTS)          " "                    " "                    " 
+     "YES" 13 01        "NO"  12 03        "DOWN" 12 03        "UP"  12 01      "MENU" 01 04
+
+12 03 "RT MAIN GEAR?    3/4" "(NO FAULTS)         " "                    " "                    " 
+     "NO"  12 04        "DOWN" 12 04        "UP"  12 02      "MENU" 01 04
+
+12 04 "NOSE GEAR?       4/4" "(5 FAULTS)          " "                    " "                    " 
+     "YES" 19 01    "NO"  12 01        "DOWN" 12 01        "UP"  12 03      "MENU" 01 04
+
+13 01 "LGUL?            1/3" "(1 FAULT)           " "                    " "                    " 
+     "YES" 14 01        "NO"  13 02        "DOWN" 13 02        "UP"  12 02      "MENU" 01 04
+
+13 02 "LGDL?            2/3" "(4 FAULTS)          " "                    " "                    " 
+     "YES" 16 01        "NO"  13 03        "DOWN" 13 03        "UP"  13 01      "MENU" 01 04
+
+13 03 "LDOOR?           3/3" "(1 FAULT)           " "                    " "                    " 
+     "YES" 15 01        "NO"  12 02        "DOWN" 12 02        "UP"  13 02      "MENU" 01 04
+
+14 01 "LGUL ON LEG 1:   1/1" "BOARD A1 F1 A       " "                    " "                    " 
+     "DOWN" 13 01        "UP"  13 01      "MENU" 01 04
+
+15 01 "LDOOR ON LEG 32: 1/1" "LARGE GAP (.18) A   " "                    " "                    " 
+     "DOWN" 13 03        "UP"  13 03      "MENU" 01 04
+
+16 01 "LGDL ON LEG 1:   1/4" "SMALL GAP (.04) G   " "                    " "                    " 
+     "DOWN" 16 02        "UP"  13 02      "MENU" 01 04
+
+16 02 "LGDL ON LEG 2:   2/4" "SMALL GAP (.04) G   " "                    " "                    " 
+     "DOWN" 16 03        "UP"  16 01      "MENU" 01 04
+
+16 03 "LGDL ON LEG 3:   3/4" "SMALL GAP (.04) G   " "                    " "                    " 
+     "DOWN" 16 04        "UP"  16 02      "MENU" 01 04
+
+16 04 "LGDL ON LEG 32:  4/4" "SMALL GAP (.04) G   " "                    " "                    " 
+     "DOWN" 13 02        "UP"  16 03      "MENU" 01 04
+
+17 01 "NGUL ON LEG 1:   1/5" "SENSOR OPEN G       " "                    " "                    " 
+     "DOWN" 17 02        "UP"  19 01      "MENU" 01 04
+
+17 02 "NGUL ON LEG 2:   2/5" "SENSOR OPEN G       " "                    " "                    " 
+     "DOWN" 17 03        "UP"  17 01      "MENU" 01 04
+
+17 03 "NGUL ON LEG 2:   3/5" "SMALL GAP (.01) A   " "                    " "                    " 
+     "DOWN" 17 04        "UP"  17 02      "MENU" 01 04
+
+17 04 "NGUL ON LEG 3:   4/5" "SMALL GAP (.02) A   " "                    " "                    " 
+     "DOWN" 17 05        "UP"  17 03      "MENU" 01 04
+
+17 05 "NGUL ON LEG 4:   5/5" "SMALL GAP (.02) A   " "                    " "                    " 
+     "DOWN" 19 01        "UP"  17 04      "MENU" 01 04
+
+19 01 "NGUL?            1/2" "(5 FAULTS)          " "                    " "                    " 
+     "YES" 17 01        "NO"  19 02        "DOWN" 19 02        "UP"  12 04      "MENU" 01 04
+
+19 02 "NGDL?            2/2" "(NO FAULTS)         " "                    " "                    " 
+     "NO"  12 04        "DOWN" 12 04        "UP"  19 01      "MENU" 01 04
+
+24 01 "LG LEVER DOWN    1/5" "TRUE                " "                    " "                    " 
+     "NO"  24 02        "DOWN" 24 02        "UP"  20 04      "MENU" 01 04
+
+24 02 "LG LEVER UP      2/5" "FALSE               " "                    " "                    " 
+     "NO"  24 03        "DOWN" 24 03        "UP"  24 01      "MENU" 01 04
+
+24 03 "L THROTTLE RET   3/5" "TRUE                " "                    " "                    " 
+     "NO"  24 04        "DOWN" 24 04        "UP"  24 02      "MENU" 01 04
+
+24 04 "R THROTTLE RET   4/5" "TRUE                " "                    " "                    " 
+     "NO"  24 05        "DOWN" 24 05        "UP"  24 03      "MENU" 01 04
+
+24 05 "FLAPS EXT        5/5" "TRUE                " "                    " "                    " 
+     "NO"  24 01        "DOWN" 20 04        "UP"  24 04      "MENU" 01 04
+

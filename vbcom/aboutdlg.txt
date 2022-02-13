@@ -1,0 +1,74 @@
+Sub Command1_Click ()
+    Unload AboutDlg
+End Sub
+
+Sub Form_Load ()
+
+    Remove_Items_From_SysMenu AboutDlg
+
+    Initialize
+
+    Height = Command1.top + (Command1.Height * 1.5) + (Height - ScaleHeight)
+
+    CenterDialog AboutDlg
+
+End Sub
+
+
+Sub Initialize ()
+
+    Dim NewLeft     As Integer
+    Dim NewTop      As Integer
+    Dim Counter     As Integer
+    Dim MaxWidth    As Integer
+
+    Static Text$(0 To 5)
+    Static Size(0 To 5) As Integer
+
+    Text$(0) = "Communication Demo"
+    Text$(1) = "written in"
+    Text$(2) = "Microsoft Visual Basic Programming System"
+    Text$(3) = "Version 1.00"
+    Text$(4) = "for"
+    Text$(5) = "Microsoft Windows 3.00"
+
+    Size(0) = 24
+    Size(1) = 12
+    Size(2) = 12
+    Size(3) = 12
+    Size(4) = 12
+    Size(5) = 12
+
+    CurrentY = Command1.Height / 2
+    MaxWidth = TextWidth(Caption)
+
+    For Counter = 0 To 5
+        FontSize = Size(Counter)
+        
+        WorkWidth = TextWidth(Text$(Counter))
+        If WorkWidth > MaxWidth Then MaxWidth = WorkWidth
+
+        CurrentX = (ScaleWidth - WorkWidth) / 2
+        
+        Print Text$(Counter);
+        CurrentY = CurrentY + TextHeight(Text$(Counter))
+    Next Counter
+
+    Line ((ScaleWidth - MaxWidth) / 2, CurrentY)-(((ScaleWidth - MaxWidth) / 2) + MaxWidth, CurrentY + 30), QBColor(0), BF
+    
+    width = MaxWidth + Command1.width
+
+    NewLeft = (ScaleWidth - Command1.width) / 2
+    NewTop = CurrentY + Command1.Height
+
+    Command1.Move NewLeft, NewTop
+
+End Sub
+
+Sub Form_Paint ()
+    
+    Initialize
+    UpdateCaption " DIALOG: " + Caption, 0
+
+End Sub
+

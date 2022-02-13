@@ -1,0 +1,113 @@
+'*******************************************************************************************
+'* GLOBAL MODULE
+'*******************************************************************************************
+DefInt A-Z
+
+'COM Device Control Block (DCB) data structure.  This structure is used as an argument to
+'the Windows API functions GetCommState and SetCommState.
+
+Type CommStateDCB
+    Id          As String * 1   ' Port Id from OpenComm
+    BaudRate    As Integer      ' Baud Rate
+    ByteSize    As String * 1   ' Data Bit Size (4 to 8)
+    Parity      As String * 1   ' Parity
+    StopBits    As String * 1   ' Stop Bits
+    RlsTimeOut  As Integer      ' Carrier Detect Time "CD"
+    CtsTimeOut  As Integer      ' Clear-to-Send Time
+    DsrTimeOut  As Integer      ' Data-Set-Ready Time
+    ModeControl As Integer      ' Mode Control Bit Fields
+    XonChar     As String * 1   ' XON character
+    XoffChar    As String * 1   ' XOFF character
+    XonLim      As Integer      ' Min characters in buffer before XON is sent
+    XoffLim     As Integer      ' Max characters in buffer before XOFF is send
+    peChar      As String * 1   ' Parity Error Character
+    EofChar     As String * 1   ' EOF/EOD character
+    EvtChar     As String * 1   ' Event character
+    TxDelay     As Integer      ' Reserved/Not Used
+End Type
+
+'COM status record structure used by the Windows GetCommError API function
+
+Type COMSTAT
+    ModeControl As String * 1
+    cbInQue As Integer
+    cbOutQue As Integer
+End Type
+
+'COM related Windows API function declarations
+
+Declare Function OpenComm Lib "user" (ByVal lpComName As String, ByVal wInQueue As Integer, ByVal wOutQueue As Integer) As Integer
+Declare Function CloseComm Lib "user" (ByVal nCid As Integer) As Integer
+
+Declare Function WriteComm Lib "user" (ByVal nCid As Integer, ByVal lpBuf As String, ByVal nSize As Integer) As Integer
+Declare Function ReadComm Lib "user" (ByVal nCid As Integer, ByVal lpBuf As String, ByVal nSize As Integer) As Integer
+
+Declare Function GetCommEventMask Lib "user" (ByVal nCid As Integer, ByVal nEvtMask As Integer) As Integer
+Declare Function SetCommEventMask Lib "user" (ByVal nCid As Integer, ByVal nEvtMask As Integer) As Integer
+
+Declare Function SetCommState Lib "user" (DCB As CommStateDCB) As Integer
+Declare Function GetCommState Lib "user" (ByVal nCid As Integer, DCB As CommStateDCB) As Integer
+
+Declare Function GetCommError Lib "user" (ByVal nCid As Integer, lpStat As COMSTAT) As Integer
+Declare Function FlushComm Lib "user" (ByVal nCid As Integer, ByVal nQueue As Integer) As Integer
+
+' GLOBAL CONSTANTS
+
+'Boolean constants
+
+'Global Const False = 0
+'Global Const True = Not False
+
+'OpenComm API function related errors.
+
+Global Const IE_BADID = -1      ' Invalid or unsupported id
+Global Const IE_OPEN = -2       ' Device Already Open
+Global Const IE_NOPEN = -3      ' Device Not Open
+Global Const IE_MEMORY = -4     ' Unable to allocate queues
+Global Const IE_DEFAULT = -5    ' Error in default parameters
+Global Const IE_HARDWARE = -10  ' Hardware Not Present
+Global Const IE_BYTESIZE = -11  ' Illegal Byte Size
+Global Const IE_BAUDRATE = -12  ' Unsupported BaudRate
+
+'General communications errors
+
+Global Const CE_BREAK = &H10    'Break occurred
+Global Const CE_CTSTO = &H20    'Clear-to-send line timeout
+Global Const CE_DNS = &H800     'Parallel device not selected
+Global Const CE_DSRTO = &H40    'Data-set-ready (DSR) timeout
+Global Const CE_FRAME = &H8     'Framing error
+Global Const CE_IOE = &H400     'Parallel device input/output (I/O) error
+Global Const CE_MODE = &H8000   'Requested mode not supported
+Global Const CE_OOP = &H1000    'Parallel device out of paper error
+Global Const CE_OVERRUN = &H2   'Overrun error
+Global Const CE_PTO = &H200     'Parallel device timeout
+Global Const CE_RLSDTO = &H80   'Receive-line-signal-detect or carrier-detect timeout
+Global Const CE_RXOVER = &H1    'Receive buffer overflow error
+Global Const CE_RXPARITY = &H4  'Parity error
+Global Const CE_TXFULL = &H100  'Transmit buffer full error
+
+'Possible event settings by calling the Windows API function SetCommEventMask
+
+Global Const EV_RXCHAR = &H1    'Set when a character is received in the COM receive buffer
+Global Const EV_RXFLAG = &H2    'Set when the COM event character is received
+Global Const EV_TXEMPTY = &H4   'Set when the last character in the transmit buffer is sent
+Global Const EV_CTS = &H8       'Set when the clear-to-send (CTS) line changes state
+Global Const EV_DSR = &H10      'Set when the data-set-ready (DSR) line changes state
+Global Const EV_RLSD = &H20     'Set when the receive-line-signal-detect (RLSD) line changes state
+Global Const EV_BREAK = &H40    'Set when a break is detected
+Global Const EV_ERR = &H80      'Set when line-status error (framing, overrun or buffer overflow) occurs: see CE_FRAME, CE_OVERRUN, CE_RXPARITY above
+Global Const EV_RING = &H100    'Set when a ring is detected
+Global Const EV_PERR = &H200    'Set when a printer error is detected
+
+'Constants for parity settings
+
+Global Const NOPARITY = 0
+Global Const ODDPARITY = 1
+Global Const EVENPARITY = 2
+
+'Constants for stop bits
+
+Global Const ONESTOPBIT = 0
+Global Const ONE5STOPBITS = 1   '1.5 STOP BITS
+Global Const TWOSTOPBITS = 2
+

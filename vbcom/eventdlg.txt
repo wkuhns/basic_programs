@@ -1,0 +1,197 @@
+
+Dim WorkEventMask As Integer
+
+Sub Form_Load ()
+
+    Remove_Items_From_SysMenu EventDlg
+
+    Initialize
+
+    CenterDialog EventDlg
+
+End Sub
+
+
+Sub Initialize ()
+
+    WorkEventMask = CommEventMask
+
+    Clear_To_Send_Check.Value = Abs((WorkEventMask And EV_CTS) = EV_CTS)
+    Data_Set_Ready_Check.Value = Abs((WorkEventMask And EV_DSR) = EV_DSR)
+    Receive_Line_Detect_Check.Value = Abs((WorkEventMask And EV_RLSD) = EV_RLSD)
+
+    Characters_Received_Check.Value = Abs((WorkEventMask And EV_RXCHAR) = EV_RXCHAR)
+    Event_Character_Received_Check.Value = Abs((WorkEventMask And EV_RXFLAG) = EV_RXFLAG)
+    Last_Character_Sent_Check.Value = Abs((WorkEventMask And EV_TXEMPTY) = EV_TXEMPTY)
+
+    Break_Detected_Check.Value = Abs((WorkEventMask And EV_BREAK) = EV_BREAK)
+    Ring_Indicator_Check.Value = Abs((WorkEventMask And EV_RING) = EV_RING)
+
+    Line_Status_Error_Check.Value = Abs((WorkEventMask And EV_ERR) = EV_ERR)
+    Printer_Error_Check.Value = Abs((WorkEventMask And EV_PERR) = EV_PERR)
+   
+End Sub
+
+Sub Reset_Command_Click ()
+
+    Initialize
+
+End Sub
+
+Sub OK_Command_Click ()
+    
+    If CommDeviceNum > 0 And CommHandle > -1 Then
+
+        If WorkEventMask = CommEventMask Then
+            Unload EventDlg
+            Exit Sub
+        End If
+
+        UpdateCaption " DIALOG: Change Active Settings (Yes), Post-Pone (No), Return to Dialog (Cancel)", 0
+        
+        Result% = MsgBox("Port Already Active!" + Chr$(13) + "Activate settings Now?", 3 + 16 + 256, "Terminal Sampler II - Port Active")
+    
+        Select Case Result%
+            Case 6
+                UpdateCaption " Changing Port Settings LIVE!", 0
+                
+                CommEventMask = WorkEventMask
+                PostEventMask = WorkEventMask
+
+                ApiErr% = SetCommEventMask(CommHandle, CommEventMask)
+                
+                Unload EventDlg
+            Case 7
+                UpdateCaption " Settings Post-Poned until next CONNECT", 0
+                
+                PostEventMask = WorkEventMask
+                
+                Unload EventDlg
+            Case Else
+                UpdateCaption " DIALOG: " + caption, 0
+        End Select
+
+    Else
+        
+        CommEventMask = WorkEventMask
+        PostEventMask = WorkEventMask
+
+        Unload EventDlg
+
+    End If
+
+End Sub
+
+Sub Cancel_Command_Click ()
+
+    Unload EventDlg
+
+End Sub
+
+Sub Break_Detected_Check_Click ()
+    
+    If Break_Detected_Check.Value Then
+        WorkEventMask = WorkEventMask Or EV_BREAK
+    Else
+        WorkEventMask = WorkEventMask And (EV_ALL - EV_BREAK)
+    End If
+
+End Sub
+
+Sub Characters_Received_Check_Click ()
+
+    If Characters_Received_Check.Value Then
+        WorkEventMask = WorkEventMask Or EV_RXCHAR
+    Else
+        WorkEventMask = WorkEventMask And (EV_ALL - EV_RXCHAR)
+    End If
+
+
+End Sub
+
+Sub Clear_To_Send_Check_Click ()
+
+    If Clear_To_Send_Check.Value Then
+        WorkEventMask = WorkEventMask Or EV_CTS
+    Else
+        WorkEventMask = WorkEventMask And (EV_ALL - EV_CTS)
+    End If
+
+End Sub
+
+Sub Data_Set_Ready_Check_Click ()
+
+    If Data_Set_Ready_Check.Value Then
+        WorkEventMask = WorkEventMask Or EV_DSR
+    Else
+        WorkEventMask = WorkEventMask And (EV_ALL - EV_DSR)
+    End If
+
+End Sub
+
+Sub Event_Character_Received_Check_Click ()
+
+    If Event_Character_Received_Check.Value Then
+        WorkEventMask = WorkEventMask Or EV_RXFLAG
+    Else
+        WorkEventMask = WorkEventMask And (EV_ALL - EV_RXFLAG)
+    End If
+
+End Sub
+
+Sub Last_Character_Sent_Check_Click ()
+
+    If Last_Character_Sent_Check.Value Then
+        WorkEventMask = WorkEventMask Or EV_TXEMPTY
+    Else
+        WorkEventMask = WorkEventMask And (EV_ALL - EV_TXEMPTY)
+    End If
+
+End Sub
+
+Sub Line_Status_Error_Check_Click ()
+
+    If Line_Status_Error_Check.Value Then
+        WorkEventMask = WorkEventMask Or EV_ERR
+    Else
+        WorkEventMask = WorkEventMask And (EV_ALL - EV_ERR)
+    End If
+
+End Sub
+
+Sub Printer_Error_Check_Click ()
+
+    If Printer_Error_Check.Value Then
+        WorkEventMask = WorkEventMask Or EV_PERR
+    Else
+        WorkEventMask = WorkEventMask And (EV_ALL - EV_PERR)
+    End If
+
+End Sub
+
+Sub Receive_Line_Detect_Check_Click ()
+
+    If Receive_Line_Detect_Check.Value Then
+        WorkEventMask = WorkEventMask Or EV_RLSD
+    Else
+        WorkEventMask = WorkEventMask And (EV_ALL - EV_RLSD)
+    End If
+
+End Sub
+
+Sub Ring_Indicator_Check_Click ()
+
+    If Ring_Indicator_Check.Value Then
+        WorkEventMask = WorkEventMask Or EV_RING
+    Else
+        WorkEventMask = WorkEventMask And (EV_ALL - EV_RING)
+    End If
+
+End Sub
+
+Sub Form_Paint ()
+
+    UpdateCaption " DIALOG: " + caption, 0
+
+End Sub
+

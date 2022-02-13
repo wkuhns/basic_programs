@@ -1,0 +1,2825 @@
+
+
+
+
+
+
+
+                                    Robot Project
+
+                            Interdisciplinary Curriculum
+
+
+
+                                     Bill Kuhns
+
+
+
+                                BFGoodrich Aerospace
+
+
+
+
+                                     May 8, 1995
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                        - 2 -
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                    This document describes the steps required
+                    to build a functioning multi-axis robot.
+                    Tasks are broken down into manageable steps,
+                    and requirements for each task are defined.
+                    Tasks are organized by subject area.
+                    Software, electronics, mathematics,
+                    geometry, mechanical design, and statistics
+                    are some of the areas specifically
+                    identified.
+
+                                                                  Contents
+
+
+
+          CHAPTER 1:                                      WHAT IS A ROBOT?
+            7
+
+          CHAPTER 2:                                            OBJECTIVES
+            9
+
+                 Why a robot?                                            9
+                 Structure of the project                                9
+
+                 Task details                                           11
+
+          CHAPTER 3:                                        DESIGN CHOICES
+            12
+
+                 Sensor Interface                                       12
+                 Sensors                                                12
+
+                 Mechanical                                             12
+
+          CHAPTER 4:                                         LEVEL 1 ROBOT
+            14
+
+                 Level 1 tasks:                                         15
+                 Level 1 follow-on tasks                                17
+
+          CHAPTER 5:                                         Level 2 Robot
+            18
+
+
+
+                                        - 3 -
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+       CHAPTER 6:                                                Level 319
+
+       CHAPTER 7:                                            TASK DETAIL20
+              Low level routine to read analog value                  21
+
+              Low level routine to write parallel port value          22
+
+              Low level routine to read game card switches            23
+              Embed low level routines in Pascal procedures           24
+
+              Calibrate analog sensors                                26
+
+              Convert analog sensor values to human units             28
+              Level 1 main program software                           29
+
+              Analyze analog sensor performance                       31
+
+              Software 2-D robot model                                33
+              Cartesian to screen coordinate conversion               34
+
+              Display 2-D robot model                                 35
+
+              Pack motor commands                                     36
+              Build 2-D model                                         37
+
+              Install sensor interface card                           38
+
+              Build analog sensor cable assembly                      39
+              Build parallel port cable assembly                      40
+
+              Build parallel port status indicator                    41
+
+
+       Glossary of terms                                     Glossary-42
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                                             iv
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                              CHAPTER 1: WHAT IS A ROBOT?
+
+       A robot is a system of sensors, actuators, 'intelligence', and a
+       mechanical structure. A robot will use sensors to determine its own
+       state and to determine characteristics of its environment. It will
+       compare this information with some goal or objective, and use its
+       actuators to move closer to its goal. This process will be repeated
+       until all goals are satisfied or until some error forces it to stop.
+       This type of system is called a   servo loop, and is typically drawn as
+       follows:
+
+
+
+               GOAL
+                                            DIFFERENCE  ACTUATORS
+
+
+
+                                                        ENVIRONMENT
+
+
+
+                                                         SENSORS
+                           MEASURED
+
+                           CONDITION
+
+       The goal and the measured condition are compared. The difference is
+       used to drive the actuator(s). Many systems incorporate servo loops -
+       heating systems, automotive cruise controls, and toilet tank ball
+       valves are examples.
+
+       In a robot, part of the servo loop is implemented in software. Combined
+       with more complex sensors and actuators, this provides the ability to
+       accomplish much more sophisticated behavior than a heating system or a
+       toilet tank.
+       In a robot, the goal may be very simple:    move to position x , or very
+       complex:  pour me a cup of coffee . The number and type of sensors may
+       vary. In the simplest case, the robot can only sense joint position. In
+       humans, this sense is called proprioception - it is what allows you to
+       touch your forehead with your eyes closed.
+
+       A more sophisticated robot may have tactile sensors, vision, infrared
+       sensors, or motion detectors. The choice of sensors depends on the
+       goals that the robot is to achieve.
+       We have all seen robots - both real and fictional - on television and
+       in the movies. Most robots have another characteristic beyond the
+
+
+
+                                                                              v
+
+
+
+
+
+       description given above: they are    anthropomorphous. This means that
+       they have human characteristics. Some of the fictional ones actually
+       look, walk, and talk just like a person. Real robots may simply have
+       arms that have the same type of joints as a human arm. Anthropomorphous
+       design is not technically a requirement, but the human body is a very
+       adaptable and useful mechanism. The robot built in this project will be
+       a single arm with a shoulder joint, elbow, wrist, and simple gripper in
+       place of the hand.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                                             vi
+
+
+
+
+
+
+
+
+                                CHAPTER 2: OBJECTIVES
+
+          The purpose of this project is to tie together real-world
+          problems and high school curriculum in a way that leads students
+          to discover the relevance of the skills and knowledge that has
+          been presented in their classwork. This project requires the
+          application of several different subject areas in order to be
+          successful. Teamwork, research, and individual creativity will
+          be needed.
+
+          Why a robot?
+
+          Because robots are fun, challenging, and interesting. Designing
+          and building a robot requires the synthesis of many subject
+          areas, and is typical of the types of problems encountered in
+          the real world. There are limitless possibilities for both
+          recreational and serious scientific applications of a robot, and
+          a working robot captures the attention and interest of everyone
+          from toddlers to grandparents.
+
+          Structure of the project
+
+          Building a robot is a complex and time consuming project. Most
+          people who know anything about robotics will tell you that such
+          an effort is far too large to be accomplished by high school
+          students.
+          In order to make such a project possible, this paper breaks the
+          process of building a robot into smaller mini-projects referred
+          to as tasks in this document.
+
+          Task characteristics
+
+          Tasks are grouped roughly by primary subject area, but most
+          require knowledge of several subject areas. Tasks may be
+          performed by especially motivated individuals or by teams.
+          Grouping tasks by subject allows tasks to be introduced at the
+          appropriate point in a class. For instance, students in a math
+          class might study linear interpolation and then do a robot task
+          that requires interpolation.
+          The robot task might involve using software, statistics, or
+          other techniques in addition to interpolation.
+
+          Each task is sized so that it can be accomplished in a
+          reasonable amount of time. Most tasks should take between one
+          and three hours, although actual times may vary widely.
+          Tasks are designed to be open-ended. There is no one 'right'
+          solution, although each task has specific requirements that must
+          be met. Even if a task has been done already, a new student or
+          group of students might want to try a different approach. The
+          project also includes tasks which analyze the performance of
+          various robot components. The results of analysis might suggest
+          areas where a different approach could lead to improved
+          performance. Students or teams that are highly motivated might
+
+
+
+                                        - 7 -
+
+
+
+
+
+
+
+
+          expand a task far beyond the minimum requirements. Some suggestions
+          for additional functions are suggested in the task descriptions,
+          and students should be encouraged to invent their own follow-on
+          activities.
+
+          Division into levels
+          The process of building a complete robot will take quite a long
+          time. Therefore, the project is broken down into three levels.
+          Completion of each level results in a combination of hardware,
+          software, and electronics that comprise a functional and
+          recognizable milestone toward the final robot.
+
+          These levels should be accomplished in sequence, as each level
+          depends on capabilities developed in the previous level. At the
+          completion of each level, there are also possibilities and
+          suggestions for optional independent study projects.
+          Most of the projects within a level can be accomplished in
+          isolation if necessary, but active cooperation of project teams
+          will lead to a better result.
+
+          Provided solutions
+
+          A 'know good' solution for each task is included. These
+          solutions are not necessarily the best way to solve the problem
+          - they are designed to be simple and easy to understand.
+          Students may discover more elegant or better performing
+          solutions on their own. The provided solutions are intended to
+          serve several purposes:
+          First, the instructor can review and / or test the provided
+          solution to aid in understanding how to guide students.
+
+          Second, the provided solution can be used for tasks where there
+          are no resources available or where the curriculum objectives of
+          the task do not match the current needs of the students.
+          Third, the provided solution can be used as a resource of last
+          resort if a team becomes hopelessly stuck on a task.
+
+          Last, the students might compare their own solution with the
+          provided solution. If this is done, it should ideally be in the
+          context of evaluating the strengths and weaknesses of each.
+          One alternate approach to a robot project would be to build a
+          robot using all the provided solutions, then analyze and improve
+          from that baseline.
+
+          In general, students should not review the provided solution
+          before completing their own work on the task. A large part of
+          the value of this type of project is the research and discovery
+          involved in finding a way to solve the problem.
+
+          Task details
+
+          Task details are organized by subject area and by level in the
+          last part of this paper. Each task is identified by the primary
+
+
+
+                                        - 8 -
+
+
+
+
+
+
+
+
+          subject area and level of difficulty. A list of required skills
+          and resources is included as part of each task description.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                        - 9 -
+
+
+
+
+
+
+
+
+                              CHAPTER 3: DESIGN CHOICES
+
+          In order to make this project feasible, several design decisions
+          have been made ahead of time. These choices do not represent the
+          only (or even the best) approach to building a robot. The
+          choices that have been made are intended to reduce the cost,
+          risk, and time required to get a functioning robot. Once the
+          initial robot is in place, students will be encouraged to
+          develop improvements, extensions, and accessories on their own.
+          The robot built as part of this project will be relatively small
+          and slow. It will be controlled by an IBM PC type computer,
+          using a high level programming language. It will use low voltage
+          electric motors for power, and it will incorporate sensors.
+
+
+          Sensor Interface
+          The robot will use a PC game card. These cards are inexpensive,
+          and provide four channels of analog input and four bits of
+          digital input. The analog resolution is about 0.5%, which is
+          adequate for our needs.
+
+          We will use the PC parallel port for digital output.  This port
+          provides eight bits of digital output.
+          Much more sophisticated cards exist, but they are quite
+          expensive. The challenges involved in using the game card can
+          also be quite educational.
+
+          Sensors
+
+          The robot that we will build will be able to sense joint
+          position, and will have a rudimentary tactile sensor. The joint
+          position sensors will be   potentiometers. The robot will also
+          have up to four digital inputs, which will be momentary
+          switches. At least one of these will be a grip sensor.
+
+          Mechanical
+
+          Robot complexity is usually described in terms of the number of
+          different basic motions or axes. Each axis requires an actuator.
+          Our robot will have four axes, and will be powered by variable
+          speed reversible electric motors. The axes will be:
+          · Vertical axis shoulder rotation
+
+          · Horizontal axis shoulder rotation
+          · Elbow rotation
+
+          · Grip / ungrip
+          Additional axes may be added once the basic robot is complete.
+
+
+
+
+
+
+
+
+                                       - 10 -
+
+
+
+
+
+
+
+
+                              CHAPTER 4: LEVEL 1 ROBOT
+
+          Completion of level 1 results in a single axis arm with a joint
+          position sensor interfaced to a computer. The computer can read
+          the sensor and calculate arm position. The arm must be moved by
+          hand, but it is ready to have motors attached. Some data is
+          available to predict robot speed and accuracy.
+          It will have enough capability to allow analysis of sensor
+          performance, and it will support optional exercises in model
+          building and graphics. For instance, a program could be written
+          that predicts the height of the elbow by reading the sensor. A
+          mechanical project might be to allow mechanical calibration of
+          the sensor.
+
+
+          Disk contents
+          The Pascal disk has a directory called '\LEVEL1' which contains
+          several subdirectories. These contain task solutions, program
+          shells, test programs, data files, and other material which may
+          be helpful.
+
+          \LEVEL1\GAMECARD
+
+          This subdirectory contains the following files:
+          · GAMECARD.SHL - Pascal source shell for GAMECARD.PAS. Does not
+            include any solutions.
+
+          · GAMEBIOS.PAS - Pascal source shell with the BIOS routines
+            included. These represent the solutions to the 'Low Level
+            Routine' tasks. Use this if resources are not available to
+            write the low level routines.
+          · ANALOG.PAS - solution to ReadAnalogSensor task
+
+          · SWITCH.PAS - solution to ReadSwitch task
+          · PARALLEL.PAS - solution to WriteParallelPort task
+
+          · GAMECARD.PAS - Complete Pascal source for the GameCard unit.
+          · GAMECARD.TPU - compiled unit file.
+
+          \LEVEL1\TEST
+          Test programs and shells:
+
+          · ATEST.PAS - test program for ReadAnalogSensor
+          · STEST.PAS - test program for ReadSwitch
+
+          · PTEST.PAS - test program for WriteParallelPort
+          · FTEST.PAS - test program for file i/o tasks
+
+          · GAMETEST.PAS - test program for complete GAMECARD.PAS
+
+          \LEVEL1\FILE_IO
+          Contains files related to the file i/o tasks:
+
+
+
+
+                                       - 11 -
+
+
+
+
+
+
+
+
+          · FILES.SHL - shell file that contains global array definition
+          · READ.PAS - solution to ReadCalFile task
+
+          · WRITE.PAS - solution to WriteCalFile task
+          · CALx.DAT - sample CALx.DAT file - copy to CAL1.DAT, CAL2.DAT,
+            etc.
+
+          \LEVEL1\ROBOT
+
+          Contains files related to the main level 1 program:
+          · ROBOT.SHL - Pascal source shell for the ROBOT program.
+            Includes global array definition, but no solutions.
+
+          · ROBOT.PAS - Complete level 1 software solution. Includes
+            solutions for all tasks except those in the GameCard unit.
+
+          Level 1 tasks:
+
+          These tasks form the basis for all future tasks. The software
+          tasks provide the ability to connect the computer to the robot
+          arm, while the mechanical tasks provide the first arm
+          components. Mathematical tasks begin the construction of
+          equations and models to predict robot movement as well as
+          statistical techniques to evaluate performance. Before the level
+          1 tasks can begin, the following list of resources must be
+          available:
+          · At least one PC with an empty internal card slot
+
+          · A PC 'game' card. These have a 15 pin 'D' shaped connector
+          · Pascal language installed on the PC
+
+          · 15 pin male D-submini connector
+          · 24 gauge stranded hookup wire
+
+          · At least one 250 kohm potentiometer
+          · 10 position barrier strip
+
+          · Soldering station
+          · Protractor
+
+          · Material for robot arm
+          The tasks to accomplish level 1 are listed below.
+
+          Install sensor interface card (Page 38)
+
+          Install PC game card in PC.
+
+          Build analog sensor cable assembly (Page 39)
+          Electrical task to build a cable assembly to go from the PC game
+          port to a barrier strip that supports connection to sensors and
+          switches.
+
+          Build parallel port cable assembly (Page 40)
+
+
+
+                                       - 12 -
+
+
+
+
+
+
+
+
+          Electrical task to build a cable assembly to go from the PC
+          parallel port to a barrier strip.
+
+          Low level routine to read analog value (Page 21)
+          This is a software task to read analog data (originally joystick
+          position) from the PC game card.
+
+          Low level routine to write parallel port value (Page 22)
+
+          A software task to write binary data to the PC parallel port.
+          This task can be deferred until Level 2 if desired. It is
+          included in Level 1 so that all the low level routines are
+          together.
+
+          Low level routine to read game card switches (Page 23)
+          A software task to read switch positions from the PC game card.
+
+          Embed low level routines in Pascal procedures (Page24)
+
+          A software task to write Pascal procedures and functions that
+          provide a more useful calling structure for the low level
+          routines described above.
+
+          Build 2-D model (Page 37)
+          This task involves geometry and trigonometry to develop a set of
+          equations that allow the calculation of robot arm and joint
+          positions from joint angle information.
+
+          Calibrate analog sensors (Page 26)
+
+          A relatively complex (but not difficult) software task to obtain
+          sensor values and build a calibration table that is written to a
+          disk file.
+
+          Convert analog sensor values to human units (Page 28)
+          An interdisciplinary task combining software and mathematics.
+          This task involves reading the calibration array created by the
+          previous task, then using this array with linear interpolation
+          to convert sensor values to degrees.
+
+          Level 1 main program software (Page 29)
+
+          This is a very open-ended task. An executive is needed to
+          exercise all of the software developed above.
+
+          Level 1 follow-on tasks
+
+          The following tasks can be done once the preceding level 1 tasks
+          have been completed. These tasks may be simplified by making
+          changes and additions to the Level 1 Software Executive. These
+          tasks are optional at this point, but highly recommended.
+
+          Build parallel port status indicator (Page 41)
+
+
+
+                                       - 13 -
+
+
+
+
+
+
+
+
+          Wire LEDs to the parallel port cable assembly to indicate the
+          status the parallel port.
+
+          Software 2-D robot model (Page 33)
+          Implement the 2-D equations developed above. Calculate cartesian
+          coordinates from joint angles. This task will be required for
+          Level 2.
+
+          Cartesian to screen coordinate conversion (Page 34)
+
+          Primarily mathematical task to convert cartesian coordinate
+          pairs to screen coordinates. This task will be required for
+          Level 2.
+
+          Display 2-D robot model (Page 35)
+          This is a capability that could be added to the Level 1
+          Executive. It involves translation of robot arm position data to
+          computer screen coordinates and creating a graphical display of
+          the robot arm. This task will be required for Level 2.
+
+          Analyze analog sensor performance (Page 31)
+
+          An interdisciplinary task to gather and analyze data on the
+          performance of the robot arm, sensor, sensor interface, and
+          software.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                       - 14 -
+
+
+
+
+
+
+
+
+                              CHAPTER 5: Level 2 Robot
+
+          This level results in a robot arm that can be completely
+          controlled and sensed via software. Motors have been attached
+          and are under the control of simple software. Speed and accuracy
+          have been predicted and measured. Performance may not be
+          optimized, but the tools to analyze and improve performance
+          exist. Optional projects involving path generation and 3-D
+          geometry are possible at this point.
+
+          Software 2-D robot model (Page 33)
+          If not completed under Level 1, implement the 2-D equations
+          developed above. Calculate cartesian coordinates from joint
+          angles.
+
+          Cartesian to screen coordinate conversion (Page 34)
+
+          If not completed under Level 1, develop routine to convert
+          cartesian coordinate pairs to screen coordinates.
+
+          Display 2-D robot model (Page 35)
+          If not completed under Level 1, translate robot arm position
+          data to computer screen coordinates and create a graphical
+          display of the robot arm.
+
+
+
+          · build 3-D robot model from joint angles
+          · convert 3-D cartesian coordinates to 2-D projection
+
+          · convert 2-D cartesian coordinates to 2-D computer screen
+            coordinates
+          · detailed performance analysis (resolution, error
+            distribution, hysteresis)
+
+          · build driver to turn on 12 volt motor from 5 volt logic
+          · build bi-directional 12 volt driver with 2 bit input
+
+          · build LED test circuit for computer digital output
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                       - 15 -
+
+
+
+
+
+
+
+
+                                 CHAPTER 6: Level 3
+
+          Level 3 results in a complete robot arm, with control software
+          and multiple sensor types. Software can direct the robot arm to
+          perform multi-step tasks, and sensors provide feedback to verify
+          task completion. Performance enhancements have been identified
+          and implemented.
+          At this point, the robot is a functioning system that can grow
+          and evolve. Projects to add capability or to design more complex
+          tasks are possible.
+
+          · assembler routine to read discrete inputs
+          · performance analysis
+
+          · path generation
+          · build D/A converter
+
+          · build variable speed motor driver with analog input
+          · build current limited switch interface
+
+          · build calibration circuit for potentiometer sensors
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                       - 16 -
+
+
+
+
+
+
+
+
+                               CHAPTER 7: TASK DETAIL
+
+          This section contains the detailed task descriptions.
+          Descriptions are grouped by robot function level and primary
+          subject area. A brief list of materials is included with each
+          task. More detailed material descriptions are included in an
+          appendix.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                       - 17 -
+
+
+
+
+
+
+
+
+          Low level routine to read analog value
+
+                                  Robot project level:            1
+                                  Primary subject area:   SOFTWARE
+
+                                  Difficulty:             ADVANCED
+
+          SKILLS REQUIRED
+          This task requires research into documentation of the PC BIOS.
+          An understanding of microprocessor registers and assembly
+          language would be helpful. This task involves a more detailed
+          knowledge of computer internals than most students would be
+          expected to possess.
+
+          RESOURCES REQUIRED
+
+          · PC with game card and Pascal
+          · Sensor interface cable assembly
+
+          · 250 kohm potentiometer
+
+          DESCRIPTION
+          The robot uses a PC game card for analog input from the robot to
+          the computer. A game card can read four different analog values
+          (normally two axes each for two different joysticks).
+
+          We need an low level procedure to read all four channels.
+          This procedure must make the appropriate PC BIOS call. It will
+          read an eight bit unsigned integer for each channel.
+
+          The details of the BIOS call may be obtained by searching
+          documentation, or by a network/BBS search.
+          Input: four variables by reference
+
+          Output: four variables are set.
+          Declaration format:
+
+          procedure ReadJoysticks(var Xaxis1, Yaxis1, Xaxis2, Yaxis2 :
+          word);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                       - 18 -
+
+
+
+
+
+
+
+
+          Low level routine to write parallel port value
+
+                                  Robot project level:            1
+                                  Primary subject area:   SOFTWARE
+
+                                  Difficulty:             ADVANCED
+
+          SKILLS REQUIRED
+          Familiarity with PC BIOS and software architecture. This task
+          involves a more detailed knowledge of computer internals than
+          most students would be expected to possess.
+
+          RESOURCES REQUIRED
+
+          · PC with game card and Pascal
+          · Parallel port cable assembly
+
+          · Multimeter
+
+          DESCRIPTION
+          An low level function is needed to write eight bits to the PC
+          parallel port. The PC parallel port is also typically known as
+          LPT1. It is often at port address 378(hex), but may be located
+          elsewhere. This function may write directly to the port, or use
+          a BIOS function.
+
+          Input: eight bit value, integer port number (unused at this
+          time, value 0)
+          Output: none. Value is written to port.
+
+          Declaration format:
+          procedure WriteParallelPort(port, value : integer);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                       - 19 -
+
+
+
+
+
+
+
+
+          Low level routine to read game card switches
+
+                                  Robot project level:            1
+                                  Primary subject area:   SOFTWARE
+
+                                  Difficulty:             INTERMEDIATE
+
+          SKILLS REQUIRED
+          This task involves bit level operations on data. Knowledge of
+          binary concepts is required.
+
+          RESOURCES REQUIRED
+
+          · PC with game card and Pascal
+          · Sensor interface cable assembly
+
+          · Jumper wire or switches
+
+          DESCRIPTION
+          Read the position of the four switches on the game card. These
+          are in the four high order bits of port 201(hex). The low order
+          bits must be ignored.
+
+          Input: none.
+          Output: four switch values packed in byte
+
+          Declaration format:
+          function ReadGameSwitches : byte;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                       - 20 -
+
+
+
+
+
+
+
+
+          Embed low level routines in Pascal procedures
+
+                                  Robot project level:            1
+                                  Primary subject area:   SOFTWARE
+
+                                  Difficulty:             INTERMEDIATE
+
+          SKILLS REQUIRED
+          Familiarity with Pascal parameter passing mechanisms and control
+          structures.
+
+          RESOURCES REQUIRED
+
+          · PC with game card and Pascal
+          · Sensor interface cable assembly
+
+          · Parallel port cable assembly
+          · Jumper wire or switches
+
+          · 250 kohm potentiometer
+
+          DESCRIPTION
+          Build Pascal procedures that use the low level functions
+          described above. Create the Pascal functions:
+
+          ReadAnalogSensor(N: Integer) which returns the integer value
+          from sensor N
+          WriteParallelPort(P, N: Integer) which writes the value N to
+          parallel port P
+
+          ReadSwitch(N: Integer) which returns the value of switch N
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                       - 21 -
+
+
+
+
+
+
+
+
+          Calibration File I/O
+                                  Robot project level:            1
+
+                                  Primary subject area:   SOFTWARE
+                                  Difficulty:             INTERMEDIATE
+
+          SKILLS REQUIRED
+
+          Pascal programming concepts, including arrays, file I/O, and
+          control structures.
+
+          RESOURCES REQUIRED
+          · PC with Pascal
+
+          DESCRIPTION
+
+          Write two procedures - one to read calibration data from disk
+          files, and one to write data to disk files. The data will be
+          stored in a global three dimensional (4x5x2) array called
+          GlobalCalArray.
+          On disk, there will be four files (one for each of four sensors)
+          named CAL1.DAT, CAL2.DAT, and so on. Each file will have five
+          lines with two numbers on each line.
+
+          The file i/o procedures will be passed a channel number, and
+          must read or write the appropriate file from the appropriate
+          'page' of the global array. For instance, ReadCalFromDisk(3)
+          would read CAL3.DAT and place the data in GlobalCalArray[3,x,x]
+
+
+          procedure ReadCalFile(n : integer);
+
+          procedure WriteCalFile(n : integer);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                       - 22 -
+
+
+
+
+
+
+
+
+          Calibrate analog sensors
+
+                                  Robot project level:            1
+                                  Primary subject area:   SOFTWARE
+
+                                  Difficulty:             INTERMEDIATE
+
+          SKILLS REQUIRED
+          Pascal programming concepts, including arrays, console input and
+          output, and control structures.
+
+          RESOURCES REQUIRED
+
+          · PC with game card and Pascal
+          · Sensor interface cable assembly
+
+          · 250 kohm potentiometer (may be mounted to robot arm)
+          · Protractor mounted to potentiometer
+
+          DESCRIPTION
+
+          Write a procedure which allows the user to calibrate an analog
+          sensor. This procedure will use a global 4 x 5 x 2 array. The
+          first index of this array designates one of four 'pages', one
+          for each sensor. The second index is sensor position. The third
+          index selects either angle in the first column or corresponding
+          sensor reading in the second.
+          This procedure will prompt the user to move the sensor to each
+          position. The sensor will be read. The sensor value will be
+          stored in the second column of the array.
+
+          The procedure will be passed a sensor number N which determines
+          the sensor to be calibrated.
+          Psuedocode:
+
+             for row-index values 1 through 5
+               prompt user to move sensor to angle in array[N,row_index,1]
+
+               read sensor value
+               store sensor value in array[row-index,2]
+
+             next row-index
+          sample 5x2 array for an individual sensor:
+
+           sensor
+           angle      reading
+             0              2
+            20             47
+            40             85
+            60            135
+            80            181
+
+
+
+
+
+                                       - 23 -
+
+
+
+
+
+
+
+
+          Input:  global 5 X 2 array of integer values, sensor channel
+          number
+          Output: Updated array, with corresponding sensor readings
+
+          Declaration Format:
+          procedure CalibrateSensor(N: Integer)
+
+
+
+          In order to test this procedure, you will need to write a simple
+          program which provides the global array and displays the results
+          of the calibration. If the File I/O procedures are available,
+          they may be incorporated as well. If the File I/O procedures are
+          not available, the angle values will have to be placed in the
+          global array by some other means. For instance:
+
+
+              for i := 1 to 5 do
+              begin
+
+                  GlobalCalArray[1, i, 1] := (i - 1) * 20;
+                  GlobalCalArray[2, i, 1] := (i - 1) * 20;
+
+                  GlobalCalArray[3, i, 1] := (i - 1) * 20;
+                  GlobalCalArray[4, i, 1] := (i - 1) * 20;
+
+              end;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                       - 24 -
+
+
+
+
+
+
+
+
+          Convert analog sensor values to human units
+
+                                  Robot project level:            1
+                                  Primary subject area:   MATHEMATICS
+
+                                  Difficulty:             ADVANCED
+
+          SKILLS REQUIRED
+          Pascal programming concepts including arrays, file I/O, and
+          numeric types. Mathematical skills including algebra and linear
+          interpolation.
+
+          RESOURCES REQUIRED
+
+          · PC with Pascal (game card optional)
+          · Sensor interface cable assembly (optional)
+
+          · 250 kohm potentiometer (optional)
+
+          DESCRIPTION
+          Given a sensor channel number, a global calibration array, and a
+          sensor reading, perform linear interpolation to calculate an
+          angle value. See preceding specification for a description of
+          the array.
+
+          Check input value to make sure it is within the range of the
+          calibration array.
+          Input:  Integer calibration array, integer sensor reading
+
+          Output:         Floating point angle
+          function GetDegrees(Channel, Reading : Integer) : real;
+
+          For example, using the table above, an input sensor reading of
+          62 should return an output value of 27.89 degrees. An input
+          value of 245 should generate an error, since it is outside the
+          range of the calibration table.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                       - 25 -
+
+
+
+
+
+
+
+
+          Level 1 main program software
+
+                                  Robot project level:            1
+                                  Primary subject area:   SOFTWARE
+
+                                  Difficulty:             INTERMEDIATE
+
+          SKILLS REQUIRED
+          General Pascal programming.
+
+          RESOURCES REQUIRED
+
+          · PC with game card and Pascal
+          · Sensor interface cable assembly
+
+          · Robot arm with mounted potentiometer
+
+          DESCRIPTION
+          This is a simple main program which allows the other level 1
+          functions and procedures to be executed. It may contain a
+          hard-coded sensor calibration array, although it would be more
+          desirable to read the calibration array from the disk file
+          created by the calibration function. This main program may
+          contain a menu of user options. At a minimum, it must:
+
+          · periodically read the analog sensor
+          · convert the reading to degrees
+
+          · display the resulting joint angle on the screen
+          · provide a mechanism to terminate the program
+
+          · periodically read the switch positions
+          · display the switch values
+
+          The joint angle may be displayed as a numeric value, although
+          graphic representation is encouraged. If there is a menu, it
+          might offer options to calibrate the sensor, collect performance
+          data, display raw input values, or other useful features.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                       - 26 -
+
+
+
+
+
+
+
+
+          program robot;
+          uses dos, gamecard;
+
+          var
+              GlobalCalArray array[1..4, 1..5, 1..2] of real;
+
+          {procedures and functions to be used or tested}
+          begin
+
+              {your main stuff here}
+          end.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                       - 27 -
+
+
+
+
+
+
+
+
+          Analyze analog sensor performance
+
+                                  Robot project level:            1
+                                  Primary subject area:   MATHEMATICS
+
+                                  Difficulty:             INTERMEDIATE
+
+          SKILLS REQUIRED
+          Basic statistics, measurement, data recording.
+
+          RESOURCES REQUIRED
+
+          · PC with game card and Pascal
+          · Robot arm with mounted sensor
+
+          · Measurement instruments (dial caliper, protractor, etc.)
+
+          DESCRIPTION
+          Using the procedures and functions described above, determine
+          the performance characteristics of the analog sensor (accuracy,
+          precision, hysteresis, error distribution). This will require
+          the use of some external measurement equipment such as a
+          protractor. The sensor may be analyzed as a separate component
+          or in conjunction with the robot arm, but sensor readings should
+          be made using the Pascal functions developed previously. The
+          Level 1 main program should be adequate to perform this task,
+          but custom software might make this task easier.
+
+          Specific analysis should include:
+          · Sensor linearity (reading vs. actual position over at least
+            10 points)
+
+          · Worst case and average error in degrees. What is the
+            resultant elbow position error?
+          · Repeatability
+
+          · Worst case hysteresis (difference between readings at the
+            same position, taken while moving in opposite directions)
+          · Resolution (smallest measurable movement, in degrees)
+
+          Try to determine error sources - the sensor itself, the game
+          card, software, or other sources. Identify areas where
+          performance could be improved.
+          Develop an equation to calculate elbow speed (in inches per
+          second) given shoulder rotation speed (in degrees per second).
+          Get data on the actuator design. Predict elbow speed.
+
+          Optional exercise: Measure raw sensor output (the
+          ReadAnalogSensor function) vs. actual position. Plot the results
+          and calculate a best-fit straight line using least squares
+          linear regression. If you calculated the sensor position from
+          the raw sensor output using the equation for this straight line,
+          how much error would be introduced?
+
+
+
+                                       - 28 -
+
+
+
+
+
+
+
+
+          Software 2-D robot model
+
+                                  Robot project level:            1
+                                  Primary subject area:   SOFTWARE
+
+                                  Difficulty:             INTERMEDIATE
+
+          SKILLS REQUIRED
+          Pascal programming, general algebra.
+
+          RESOURCES REQUIRED
+
+          · PC with Pascal (game card optional)
+          · Sensor interface cable assembly (optional)
+
+          · Robot arm with potentiometer (optional)
+
+          DESCRIPTION
+          In software, create a representation of the 2-D robot model
+          developed in the Mathematical exercise. Implement the algorithms
+          to determine robot coordinates from sensor values.
+
+          Input:  Sensor readings in degrees
+          Output: Structure containing 2-D coordinates of robot arm joints
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                       - 29 -
+
+
+
+
+
+
+
+
+          Cartesian to screen coordinate conversion
+
+                                  Robot project level:            1
+                                  Primary subject area:   MATHEMATICS
+
+                                  Difficulty:             INTERMEDIATE
+
+          SKILLS REQUIRED
+          Pascal programming, general algebra.
+
+          RESOURCES REQUIRED
+
+          · PC with Pascal
+
+          DESCRIPTION
+          Computer graphics use screen coordinates that start with 0,0 in
+          the top left corner. Cartesian coordinates start with 0,0 in the
+          bottom left corner. Develop and implement an equation to convert
+          a cartesian coordinate pair to graphic screen coordinates.
+          Perform scaling so that the size of the cartesian coordinate
+          system can be specified.
+
+          Global: Maximum X cartesian value
+                  Maximum Y cartesian value
+
+                  Screen size in pixels
+           Input: Cartesian coordinate pair
+
+          Output: Graphics coordinate pair
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                       - 30 -
+
+
+
+
+
+
+
+
+          Display 2-D robot model
+
+                                  Robot project level:            1
+                                  Primary subject area:   SOFTWARE
+
+                                  Difficulty:             ADVANCED
+
+          SKILLS REQUIRED
+
+          DESCRIPTION
+          Write the graphics to display a graphic representation of the
+          robot arm based on a structure containing robot arm joint
+          coordinates.
+
+          Input:  2-D robot coordinates
+          Output: None. Graphical representation
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                       - 31 -
+
+
+
+
+
+
+
+
+          Pack motor commands
+
+                                  Robot project level:            1
+                                  Primary subject area:   SOFTWARE
+
+                                  Difficulty:             INTERMEDIATE
+
+          SKILLS REQUIRED
+          Bit level operations in Pascal.
+
+          DESCRIPTION
+
+          The PC parallel port will be used to control electric motors
+          that drive the robot. Each motor is bi-directional, and will be
+          controlled by two bits. Thus, the eight bit parallel port will
+          be able to control four motors.
+          Bits 0 and 1 will control the first motor, bits 2 and 3 will
+          control the next motor, and so on.
+
+          This procedure must 'remember' the commands for all four motors.
+          When this procedure is called, it will receive a motor number (0
+          to 3) and a command (FORWARD, REVERSE, STOP). It will pack the
+          new command into the correct bits and write the resultant value
+          to the parallel port. This value is also the return value of the
+          function.
+          Bit values:
+
+                  FORWARD         10
+                  REVERSE         01
+                  STOP                    00
+          Inputs: motor number, command
+
+          Outputs: motor control byte
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                       - 32 -
+
+
+
+
+
+
+
+
+          Build 2-D model
+
+                                  Robot project level:            1
+                                  Primary subject area:   MATHEMATICS
+
+                                  Difficulty:             ADVANCED
+
+          SKILLS REQUIRED
+          Geometry and trigonometry, Pascal programming.
+
+          DESCRIPTION
+
+          We need a set of functions that describe the behavior of the
+          robot arm in mathematical terms. Specifically, we need to be
+          able to calculate
+          · X, Y position of the elbow joint given a shoulder angle in
+            degrees
+
+          · Shoulder angle in degrees given a desired elbow position
+          You will be provided with additional information: the X, Y
+          position of the shoulder, and the length of the arm segment.
+
+          The result of this task should be a pair of equations that can
+          be explained to a person who will build them into a computer
+          program.
+                                          x,y elbow
+
+            x,y shoulder
+                             rotation angle in degrees
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                       - 33 -
+
+
+
+
+
+
+
+
+          Install sensor interface card
+
+                                  Robot project level:            1
+                                  Primary subject area:   HARDWARE
+
+                                  Difficulty:             INTERMEDIATE
+
+          SKILLS REQUIRED
+          Knowledge of PC hardware, ESD precautions, reading
+          documentation.
+
+          RESOURCES REQUIRED
+
+          · PC with empty internal expansion slot
+          · PC game card
+
+          DESCRIPTION
+
+          Install the game card in the PC. Check to ensure that there are
+          no address conflicts with existing cards. Disable any interrupts
+          on the game card.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                       - 34 -
+
+
+
+
+
+
+
+
+          Build analog sensor cable assembly
+
+                                  Robot project level:            1
+                                  Primary subject area:   ELECTRICAL
+
+                                  Difficulty:             INTERMEDIATE
+
+          SKILLS REQUIRED
+          Reading documentation, soldering, using continuity tester.
+
+          RESOURCES REQUIRED
+
+          · 15 pin connector
+          · Stranded hookup wire
+
+          · 10 position barrier strip
+          · Soldering station
+
+          DESCRIPTION
+
+          Build cable assembly with 15 pin D-submini connector on one end
+          and a labeled barrier strip on the other. The barrier strip
+          should have connections to the following game port signals:
+          Game port signal                Barrier strip label
+
+          Joystick 1 X            Analog channel 1
+          Joystick 1 Y            Analog channel 2
+
+          Joystick 2 X            Analog channel 3
+          Joystick 2 Y            Analog channel 4
+
+          Joystick 1 button 1             Switch 1
+          Joystick 1 button 2             Switch 2
+
+          Joystick 2 button 1             Switch 3
+          Joystick 2 button 2             Switch 4
+
+          Ground                  Ground
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                       - 35 -
+
+
+
+
+
+
+
+
+          Build parallel port cable assembly
+
+                                  Robot project level:            1
+                                  Primary subject area:   ELECTRICAL
+
+                                  Difficulty:             INTERMEDIATE
+
+          SKILLS REQUIRED
+          Reading documentation, soldering, using continuity tester.
+
+          RESOURCES REQUIRED
+
+          · 25 pin connector
+          · Stranded hookup wire
+
+          · 10 position barrier strip
+          · Soldering station
+
+          DESCRIPTION
+
+          Build cable assembly with 25 pin D-submini connector on one end
+          and a labeled barrier strip on the other. The barrier strip
+          should have connections to the following parallel port signals:
+          Pin number       Parallel port signal             Barrier strip
+          label
+
+          2               Data 0                  channel 1
+          3               Data 1                  channel 2
+
+          4               Data 2                  channel 3
+          5               Data 3                  channel 4
+
+          6               Data 4                  channel 5
+          7               Data 5                  channel 6
+
+          8               Data 6                  channel 7
+          9               Data 7                  channel 8
+
+          25              Ground                  GROUND
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                       - 36 -
+
+
+
+
+
+
+
+
+          Build parallel port status indicator
+
+                                  Robot project level:            1
+                                  Primary subject area:   ELECTRICAL
+
+                                  Difficulty:             INTERMEDIATE
+
+          SKILLS REQUIRED
+          Reading documentation, soldering, Ohm's law, algebra.
+
+          RESOURCES REQUIRED
+
+          · Parallel port cable assembly
+          · 8 resistors
+
+          · 8 LEDs
+          · Soldering station
+
+          DESCRIPTION
+
+          Connect a light emitting diode (LED) to each bit of the parallel
+          output port. LEDs typically need 30 milliamps (.003 amperes) of
+          current at 5 volts. A resistor must be wired in series with each
+          LED to limit the current to this value. Calculate the size of
+          resistor needed to protect the LED. You may ignore the
+          resistance of the LED itself.
+          Mount the LEDs to the barrier strip so that each LED indicates
+          the status of the associated bit.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                       - 37 -
+
+
+
+
+
+
+
+
+                                                         Glossary of terms
+
+
+
+          A/D -
+            Analog to Digital. The conversion of an analog signal
+            (usually voltage) to a digital value.
+
+          Actuator -
+            A device for creating mechanical motion. Electric motor, air
+            or hydraulic cylinder, solenoid, etc.
+
+          Analog -
+
+            Continually varying: having a large number of possible
+            values.
+          D/A -
+
+            Digital to Analog. The conversion of a digital value to an
+            analog signal.
+          Digital -
+
+            Represented as a binary value
+          Discrete -
+
+            Having only two values: true / false, on / off
+          Hysteresis -
+
+            Lag in a system. Delay between change in input and change of
+            output.
+
+          Potentiometer -
+            Mechanically actuated variable resistor.
+
+          Resolution -
+            The smallest change or increment that can be measured.
+
+          Tactile -
+            Responding to touch
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                       - 38 -
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                       - 39 -
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                       - 40 -
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                       - 41 -
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                                     Glossary-1
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                                       Index-43
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+       o                                                            Glossary-44
+

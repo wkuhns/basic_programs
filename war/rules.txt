@@ -1,0 +1,201 @@
+The goal is to capture your opponent's general. A general is a special piece
+which can move and fight, but has no ability to hide. A general has little
+armor and fairly ineffectual weapons.
+
+An army is made up of 'units', each of which can be moved independently. Any
+unit includes the soldiers necessary to operate it.
+
+Each type of unit has certain characteristics that may affect how it is used:
+
+Armor 		- on a scale of 1 to 100, how well armored is it?
+Weapon strength - on a scale of 1 to 100, how strong is its weapon?
+Weapon Range	- How far can its weapon reach?
+Accuracy	- How accurate is the weapon?
+Speed 		- How far can it go in a unit of time?
+Stealth		- on a scale of 1 to 100, how hard is it to see?
+Vision		- how far can it see?
+Cost 		- How much does it cost to buy?
+Fuel Capacity	- How much fuel can it hold?
+Range		- How far can it go without refueling?
+Airborne	- Is it an aircraft?
+
+All units of the same type will have the same values for these characteristics.
+
+In addition, each individual unit has several characteristics that may change
+over time, as the game progresses:
+
+Health		- on a scale of 1 to 100, how healty is this unit?
+Fuel		- How much fuel remains?
+Camo		- Is the unit camoflaged at this time?
+Speed		- How fast is the unit going?
+Destination	- Where is the unit going?
+Location	- Where is the unit now?
+Attack		- See rules of engagement
+Retreat		- See rules of engagement
+Follow		- See rules of engagement
+Orders		- A list of orders that the unit is following
+
+Rules of Engagement:
+
+Each unit may be instructed on how to react when encountering an enemy unit.
+
+Each unit has an 'Attack' setting which determines the conditions for firing at
+an enemy unit. A value of 0 means the unit will never attack, and a value of
+100 means the unit will fire at any enemy that is within range.
+
+There is a 'Retreat' setting which determines conditions under which the unit
+will retreat. A setting of 0 means the unit will never retreat, even in the
+face of overwhelming force. A setting of 100 means the unit will retreat from
+any enemy that it sees. A setting of 50 means it will retreat from any enemy
+whose weapon strength is equal to or greater than the unit's armor.
+
+There is also a 'Follow' setting which determines conditions for following a
+retreating enemy unit. As in the other settings, 0 means never follow, and 100
+means always follow. A setting of 50 means follow any enemy if the unit has a
+weapon strength equal to or greater than the enemy's armor.
+
+Sighting the enemy
+
+When two opposing units (let's call them A and B) are within possible sight of
+each other, a check is made to see if either unit can actually see the other
+(based on stealth, camoflage, and height).
+
+    If A can see B, A reports the sighting.
+    The rules of enagement are checked for A.
+    A may then attack, retreat, or follow.
+    If A attacks and B survives, then B gets a chance to return fire
+	(assuming B is within attack range. Return fire is allowed
+	even if B cannot see A.)
+    Then, a check is made to determine if B can see A.
+
+    If B can see A, the process repeats for B.
+
+Any reported sightings appear in the sightings window. If the sighting is the
+same as a previous sighting, the time of the sighting is updated.
+
+Reported sightings are also displayed on the map as red bordered white squares.
+
+In the case of conflicting priorities, Retreating takes precedence over
+Attacking, which takes precedence over Following.
+
+
+Health
+
+Health is a 0 to 100 scale. Health of 0 means the unit has been destroyed.
+Health below 70 results in decreased speed, and health below 10 prevents the
+unit from moving. Health below 50 reduces accuracy.
+
+Armor and Weapon Strength
+
+If armor is twice weapon strength, then the weapon will not cause any damage.
+If the weapon strength is twice the armor, the unit will be destroyed.
+Intermediate values will cause proportional loss of health.
+
+Accuracy
+
+Accuracy gives the probability of hitting a target at maximum range. If the
+target is closer, the chance of hitting it is proportionally greater. At zero
+range, the chance of hitting is 100%.
+
+Terrain
+
+The map display shows the landscape. There is a vertical scale on the right
+hand side which shows the colors for different altitudes.
+
+Altitude as two effects. First, altitude affects the speed of all ground-based
+units. The lowest altitude areas (shown in blue) are swamps, and cause a 90%
+reduction in speed. On dry ground, increasing altitude results in decreasing
+speed.
+
+The second effect is on vision. Altitude allows a unit to see farther. If two
+units are at different altitudes, the higher unit has the advantage.
+
+Selecting Units
+
+There are several different ways to select groups of units to give orders,
+check status, or to check orders. You may select all the units at a particular
+location, all units of a particular type, all moving units, all stopped units,
+or all units together. Regardless of how you make your selection, the selected
+units will appear in a window called the 'Unit List'.
+
+Selecting by location:
+
+Point to a spot on the map menu and click the right button. An enlarged map of
+this area will appear in another menu. Any location with one or more units will
+have an 'X'. Click on any square with an 'X' and a Unit List window will appear
+with the unit(s) at that location.
+
+Selecting by type:
+
+Click on the 'List' menu item and choose the category. All units in the
+selected category will appear in the Unit List window.
+
+Giving Orders:
+
+Orders may be given to a single unit, or to groups of units. Orders will be
+carried out in the same order that you give them.
+
+To give orders, select the unit(s) from the Unit List window (see above). To
+order the units to move, click the PATH button. Then click on one or more
+points in the Map window. The units will travel to these points in the sequence
+that you specify. When you are done with specifying the path, click the END
+button on the unit list window.
+
+To give other orders, click the ORDERS button on the unit list window. Select a
+list of orders on the ORDERS window. When you have the list you want, click the
+DONE button on the ORDERS window.
+
+When you are finished with all moves and other orders, click DONE on the Unit
+List window.
+
+Signals
+      
+Units can be ordered to send or wait for signals. A signal is a number that is
+broadcast to all units. For instance, you could order a group of tanks to move
+to a position, and send signal 1. In the meantime you can instruct another
+group to wait for signal 1, then change their attack level and move toward the
+enemy.
+
+Starting the game
+
+When the empty map window appears, select either 'New' or 'Load' from the File
+menu. If you select 'Load', a file dialog widow will appear. Select a saved
+game.
+
+If you have selected a new game, you will need to set up your delivery point
+and main base.
+
+The delivery point must be along either the top or the bottom edge, depending
+which side you are. You may select any point on the map for your main base.
+Once you select your main base, your General will be delivered. You must give
+him orders to follow a path to your main base. All other units that you order
+will be delivered with initial orders to follow this same path.
+
+Click the 'Buy' choice on the main menu bar. A buying window will appear. In
+this window, you may select units and quantities. You have a budget, and may
+buy up to 50 units. There are two boxes in the top right corner. One shows your
+remaining balance, and the other shows how many units you can buy before
+reaching the limit of 50.
+
+Select a unit type in the 'Unit' box, and enter a quantity in the 'Quantity'
+box. The total cost will appear in the 'Total' box. If this is what you want,
+click the 'OK' button. Your order will be placed in the order list. Your
+balance will be updated.
+
+If your order would exceed your remaining balance, or would exceed the limit of
+50 units, then the quantity will be adjusted as the selection is added to the
+order list.
+
+You may delete a selection from the order list by clicking on the selection and
+then clicking the 'Delete' button. Your balance and remaining units tally will
+be adjusted.
+
+Once your order is complete, click the 'Done' button. Your units will be
+delivered.
+
+At this point, you may click the 'Run' button to start the game. You may begin
+giving your units orders. Note that your units will not follow any new orders
+until they get to your main base.
+
+
+

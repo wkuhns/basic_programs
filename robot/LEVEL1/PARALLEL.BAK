@@ -1,0 +1,99 @@
+{--------------------------------------------------------------------------
+
+FILE: parallel.pas
+
+This file contains example code for functions that access the parallel port
+used in the robotics curriculum. It can be compiled using Borland Turbo Pascal
+to create a .TPU file.
+
+---------------------------------------------------------------------------}
+
+unit Parallel;
+
+interface
+
+    procedure WriteParallelPort(bitdata : byte);
+    function SetMotor(motor, direction, speed : byte) : integer;
+
+implementation
+
+uses Dos;
+
+var
+    portvalue : byte;
+
+{---------------------------------------------------------------------------
+  Solution to WriteParallelPort.
+---------------------------------------------------------------------------}
+
+procedure WriteParallelPort(bitdata : byte);
+
+begin
+    port[$378] := bitdata;
+end;
+
+{---------------------------------------------------------------------------
+  Solution to 'Pack motor commands'.
+
+  SetMotor is passed three values: the motor number to be set, the direction,
+  and the speed.
+
+  When this function is called, it will set a specific motor to a new speed
+  and direction. The other three motors must not be affected.
+
+  The global variable PortValue is used to store the byte that controls all
+  four motors. Only the bits associated with a single motor will be changed.
+
+  There are two bits for each motor. If speed is 0, both bits will be 0
+  regardless of direction. Otherwise, direction determines which bit is high:
+
+    01	- Direction 0
+    10  - Direction 1
+
+  Motor 1 uses the two least significant bits (LSBs), motor two uses the next
+  two, and so on.
+
+  A mask is calculated which will zero the bits associated with the specified
+  motor. A two bit command is calculated with the bits in the correct
+  position.
+
+----------------------------------------------------------------------------}
+
+function SetMotor(motor, direction, speed : byte) : integer;
+
+var
+    mask, command : byte;
+
+begin
+    case motor of	{ 'command' will have one of two values for any motor }
+        1: begin
+               mask := $FC;		            { 11111100 }
+               command := direction + $01;	    { 00000001 or 00000010 }
+           end;
+        2: begin
+               mask := $F3;			    { 11110011 }
+               command := direction * $04 + $04;    { 00000100 or 00001000 }
+           end;
+        3: begin
+               mask := $CF;			    { 11001111 }
+               command := direction * $10 + $10;    { 00010000 or 00100000 }
+           end;
+        3: begin
+               mask := $3F;			    { 00111111 }
+               command := direction * $40 + $40;    { 01000000 or 10000000 }
+           end;
+    end;
+
+    portvalue := portvalue and mask;	{ strip out bits for specified motor }
+
+    if speed = 0 then			{ if speed is 0, command is 0 }
+        command := 0;
+
+    portvalue := portvalue or command;  { insert new bits }
+
+    WriteParallelPort(portvalue);
+    SetMotor := portvalue;
+
+end;
+
+end.

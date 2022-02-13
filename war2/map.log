@@ -1,0 +1,10 @@
+Line 81: Class MSWinsockLib.Winsock of control Winsock was not a loaded control class.
+Line 90: Class MSComDlg.CommonDialog of control FileDialog was not a loaded control class.
+Line 84: The property name _ExtentX in Winsock is invalid.
+Line 85: The property name _ExtentY in Winsock is invalid.
+Line 86: The property name _Version in Winsock is invalid.
+Line 87: The property name Protocol in Winsock is invalid.
+Line 88: The property name RemotePort in Winsock is invalid.
+Line 93: The property name _ExtentX in FileDialog is invalid.
+Line 94: The property name _ExtentY in FileDialog is invalid.
+Line 95: The property name _Version in FileDialog is invalid.
